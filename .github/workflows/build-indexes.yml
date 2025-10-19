@@ -26,7 +26,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add recipes/**/_index.md recipes/_all.md recipes/tags.md recipes/tags/*.md recipes/ingredients.json || true
+            git add recipes/_all.md recipes/tags.md recipes/tags/*.md recipes/ingredients.json find recipes -type f -name '_index.md' -exec git add {} +
             git commit -m "chore: auto-update indexes, tags and ingredient catalog"
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
             git push origin "HEAD:${BRANCH}"
