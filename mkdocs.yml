@@ -1,0 +1,10 @@
+site_name: Taylor-Davies Family Cookbook
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Recipes:
+      - All Recipes (A–Z): recipes/_all.md
+      - Find by ingredient: recipes/find-by-ingredient.md
+plugins:
+  - search
