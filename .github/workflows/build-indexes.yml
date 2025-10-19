@@ -1,0 +1,27 @@
+name: Build Indexes, Tags & Ingredient Catalog
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  build-indexes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Generate indexes, tags and ingredient catalog
+        run: python scripts/build_indexes.py
+      - name: Commit generated pages
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add recipes/**/_index.md recipes/_all.md recipes/tags.md recipes/tags/*.md recipes/ingredients.json
+            git commit -m "chore: auto-update indexes, tags and ingredient catalog"
+            git push
+          fi
