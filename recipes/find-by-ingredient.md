@@ -26,5 +26,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 </script>
-<input id="q" placeholder="e.g., chicken, lemon" />
+<input id="q" placeholder="e.g., chicken, lemon"></input>
 <ul id="results"></ul>
