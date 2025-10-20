@@ -1,6 +1,6 @@
 # Taylor‑Davies Recipe Architect v2.1 — Modular Core
 
-*(requires compatible addendums v1.x or later)*
+Requires compatible addendums v1.x or later.
 
 ## Role and Scope
 

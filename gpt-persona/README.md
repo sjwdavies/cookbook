@@ -1,4 +1,4 @@
-# Taylor‑Davies Recipe Architect — Modular Persona Pack v2.1.0
+# Taylor‑Davies Recipe Architect — Modular Persona Pack v2.1.1
 
 This release fully complies with markdownlint rules **MD001–MD048** and provides
 a modular persona setup for ChatGPT.
@@ -40,15 +40,13 @@ The persona will ask clarifying questions, then produce clean Markdown and JSON.
 
 ## Versioning
 
-Core v2.1 • Nutrition module v1.1
+Core v2.1.1 • Nutrition module v1.1
 
 ## License
 
 Use freely within Taylor‑Davies family projects. Credit required for reuse.
 
----
-
-# Appendix: Markdownlint Rule Summary
+## Appendix: Markdownlint Rule Summary
 
 | ID | Description |
 |----|--------------|
