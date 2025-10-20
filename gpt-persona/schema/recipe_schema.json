@@ -1,0 +1,9 @@
+{
+  "title": "Recipe",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    }
+  }
+}

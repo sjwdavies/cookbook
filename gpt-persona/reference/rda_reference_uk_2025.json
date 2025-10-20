@@ -1,0 +1,25 @@
+{
+  "adult": {
+    "energy_kcal": 2200,
+    "protein_g": 50,
+    "carbs_g": 260,
+    "fat_g": 70,
+    "salt_g": 6
+  },
+  "bands": {
+    "6\u201312m": {
+      "energy_kcal": 720,
+      "protein_g": 12,
+      "carbs_g": 95,
+      "fat_g": 31,
+      "salt_g": 1
+    },
+    "1\u20133y": {
+      "energy_kcal": 1150,
+      "protein_g": 14,
+      "carbs_g": 130,
+      "fat_g": 38,
+      "salt_g": 2
+    }
+  }
+}
