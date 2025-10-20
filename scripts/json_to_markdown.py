@@ -1,83 +1,107 @@
 #!/usr/bin/env python3
-import json, sys, pathlib, re
+"""
+json_to_markdown.py
 
-def fmt_ing(i: dict) -> str:
-    qty = (i.get("quantity") or "").strip()
-    unit = (i.get("unit") or "").strip()
-    item = (i.get("item") or "").strip()
-    note = (i.get("note") or "").strip()
+Usage:
+  # Batch mode (used by CI): scans data/recipes and writes to recipes/
+  python scripts/json_to_markdown.py
+
+  # Single-file mode (local testing)
+  python scripts/json_to_markdown.py <input.json> <output.md>
+"""
+import json, sys, pathlib, re, itertools
+from typing import Iterable, Dict, Any, List
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT / "data" / "recipes"
+OUT_DIR = ROOT / "recipes"
+
+# ---------------- formatting helpers ----------------
+
+def _as_list(v) -> List[str]:
+    if v is None:
+        return []
+    if isinstance(v, str):
+        s = v.strip()
+        return [s] if s else []
+    if isinstance(v, Iterable):
+        return [str(x).strip() for x in v if str(x).strip()]
+    return []
+
+def to_slug(title: str) -> str:
+    s = (title or "").lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "untitled"
+
+def fmt_ing(i: Dict[str, Any]) -> str:
+    qty  = str(i.get("quantity") or "").strip()
+    unit = str(i.get("unit") or "").strip()
+    item = str(i.get("item") or "").strip()
+    note = str(i.get("note") or "").strip()
 
     parts = []
     if qty: parts.append(qty)
-    if unit: parts.append(unit)         # handles "" gracefully
+    if unit: parts.append(unit)
     if item: parts.append(item)
     line = " ".join(parts).strip()
     if note:
         line += f" ({note})"
-    return f"- {line}"
+    return f"- {line or '_unspecified_'}"
 
-def list_block(title: str, items) -> str:
-    if not items: return ""
+def list_block(title: str, items: Iterable[str]) -> str:
+    items = [str(x).strip() for x in items if str(x).strip()]
+    if not items:
+        return ""
     out = [f"## {title}"]
-    for x in items:
-        out.append(f"- {x}")
+    out.extend(f"- {x}" for x in items)
     out.append("")  # trailing newline
     return "\n".join(out)
 
-def to_slug(title: str) -> str:
-    s = title.lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    return s
+def render_markdown(data: Dict[str, Any]) -> str:
+    title = str(data.get("title") or "").strip()
+    if not title:
+        raise ValueError("Recipe must include a non-empty 'title'")
 
-def render_markdown(data: dict) -> str:
-    title = data.get("title", "").strip()
-    slug = data.get("slug") or to_slug(title)
+    slug = str(data.get("slug") or "").strip() or to_slug(title)
 
-    serves = data.get("serves", "").strip()
-    prep_time = data.get("prep_time", "").strip()
-    cook_time = data.get("cook_time", "").strip()
-    difficulty = data.get("difficulty", "").strip()
+    serves     = str(data.get("serves") or "").strip()
+    prep_time  = str(data.get("prep_time") or "").strip()
+    cook_time  = str(data.get("cook_time") or "").strip()
+    difficulty = str(data.get("difficulty") or "").strip()
 
-    equipment = data.get("equipment") or []
-    tags = data.get("tags") or []
-    categories = data.get("categories") or []
+    equipment  = _as_list(data.get("equipment"))
+    tags       = _as_list(data.get("tags"))
+    categories = _as_list(data.get("categories"))
 
     ingredients = data.get("ingredients") or []
+    if not isinstance(ingredients, list):
+        raise ValueError("'ingredients' must be a list")
     method = data.get("method") or []
-    notes = data.get("notes") or []
+    if not isinstance(method, list):
+        raise ValueError("'method' must be a list")
+    notes  = _as_list(data.get("notes"))
 
-    # --- YAML front matter ---
-    fm_lines = [
-        "---",
-        f'title: "{title}"',
-        f"slug: {slug}",
-    ]
-    if serves:     fm_lines.append(f'serves: "{serves}"')
-    if prep_time:  fm_lines.append(f'prep_time: "{prep_time}"')
-    if cook_time:  fm_lines.append(f'cook_time: "{cook_time}"')
-    if difficulty: fm_lines.append(f'difficulty: "{difficulty}"')
+    # ---------- YAML front matter ----------
+    fm = ["---",
+          f'title: "{title.replace(chr(34), "\\\"")}"',
+          f"slug: {slug}"]
+    if serves:     fm.append(f'serves: "{serves}"')
+    if prep_time:  fm.append(f'prep_time: "{prep_time}"')
+    if cook_time:  fm.append(f'cook_time: "{cook_time}"')
+    if difficulty: fm.append(f'difficulty: "{difficulty}"')
 
     if equipment:
-        fm_lines.append("equipment:")
-        for e in equipment:
-            fm_lines.append(f"  - {e}")
-
+        fm.append("equipment:")
+        fm.extend(f"  - {e}" for e in equipment)
     if tags:
-        fm_lines.append("tags:")
-        for t in tags:
-            fm_lines.append(f"  - {t}")
-
+        fm.append("tags:")
+        fm.extend(f"  - {t}" for t in tags)
     if categories:
-        fm_lines.append("categories:")
-        for c in categories:
-            fm_lines.append(f"  - {c}")
+        fm.append("categories:")
+        fm.extend(f"  - {c}" for c in categories)
+    fm.append("---\n")
 
-    fm_lines.append("---\n")
-
-    # --- Body ---
-    body = []
-
-    # quick facts list (serves, times, difficulty, tags shown inline too)
+    # ---------- Body ----------
     bullets = []
     if serves:     bullets.append(f"- Serves: {serves}")
     if prep_time:  bullets.append(f"- Prep Time: {prep_time}")
@@ -85,14 +109,14 @@ def render_markdown(data: dict) -> str:
     if equipment:  bullets.append(f"- Equipment: {', '.join(equipment)}")
     if difficulty: bullets.append(f"- Difficulty: {difficulty}")
     if tags:       bullets.append(f"- Tags: {', '.join(tags)}")
+
+    body: List[str] = []
     if bullets:
         body.append("\n".join(bullets) + "\n")
 
-    # sections
     body.append("## Ingredients")
     if ingredients:
-        for ing in ingredients:
-            body.append(fmt_ing(ing))
+        body.extend(fmt_ing(i) for i in ingredients)
     else:
         body.append("_No ingredients listed._")
     body.append("")
@@ -101,26 +125,56 @@ def render_markdown(data: dict) -> str:
     if notes:
         body.append(list_block("Notes", notes))
 
-    return "\n".join(fm_lines + body).rstrip() + "\n"
+    return "\n".join(itertools.chain(fm, body)).rstrip() + "\n"
 
-def main():
-    if len(sys.argv) != 3:
-        print("Usage: json_to_markdown.py <input.json> <output.md>")
-        sys.exit(2)
-    in_path = pathlib.Path(sys.argv[1])
-    out_path = pathlib.Path(sys.argv[2])
+# ---------------- single & batch modes ----------------
 
+def convert_file(in_path: pathlib.Path, out_path: pathlib.Path) -> None:
     data = json.loads(in_path.read_text(encoding="utf-8"))
-
-    # Basic sanity checks
-    required = ["title", "ingredients", "method"]
-    missing = [k for k in required if k not in data]
-    if missing:
-        raise SystemExit(f"Recipe missing keys: {missing}")
-
     md = render_markdown(data)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(md, encoding="utf-8")
 
+def batch_convert() -> int:
+    if not DATA_DIR.exists():
+        print(f"[warn] {DATA_DIR} does not exist; nothing to do")
+        return 0
+
+    json_files = sorted(DATA_DIR.rglob("*.json"))
+    if not json_files:
+        print(f"[warn] No JSON files found under {DATA_DIR}")
+        return 0
+
+    ok = 0
+    for src in json_files:
+        try:
+            data = json.loads(src.read_text(encoding="utf-8"))
+            title = str(data.get("title") or "").strip()
+            slug  = str(data.get("slug") or "").strip() or to_slug(title or src.stem)
+            cats  = _as_list(data.get("categories"))
+            category = cats[0].lower() if cats else "uncategorised"
+            out_md = OUT_DIR / category / f"{slug}.md"
+            convert_file(src, out_md)
+            print(f"[ok] {src.relative_to(ROOT)} → {out_md.relative_to(ROOT)}")
+            ok += 1
+        except Exception as e:
+            print(f"[fail] {src.relative_to(ROOT)}: {e}")
+    return 0 if ok == len(json_files) else 1
+
+def main() -> int:
+    if len(sys.argv) == 1:
+        # Batch mode for CI
+        return batch_convert()
+    elif len(sys.argv) == 3:
+        # Single-file mode
+        in_path = pathlib.Path(sys.argv[1]).resolve()
+        out_path = pathlib.Path(sys.argv[2]).resolve()
+        convert_file(in_path, out_path)
+        print(f"[ok] {in_path} → {out_path}")
+        return 0
+    else:
+        print("Usage: json_to_markdown.py <input.json> <output.md>")
+        return 2
+
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
