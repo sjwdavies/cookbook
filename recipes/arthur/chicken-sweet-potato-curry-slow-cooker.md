@@ -29,7 +29,8 @@
 2. Add spices or curry powder, mix well.
 3. Stir in chicken and tomatoes, then add the stock or water.
 4. Cook on low for 5–6 hours or high for 3 hours until everything is tender.
-5. Blend smooth or mash for desired texture. Optionally stir in 1 tsp plain yogurt after cooling.
+5. Blend smooth or mash for desired texture. Optionally stir in 1 tsp plain
+   yogurt after cooling.
 
 ## Notes
 
