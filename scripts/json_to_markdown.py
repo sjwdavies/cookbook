@@ -2,15 +2,21 @@
 """
 json_to_markdown.py
 
-Usage:
-  # Batch mode (used by CI): scans data/recipes and writes to recipes/
+Batch mode (CI):
   python scripts/json_to_markdown.py
 
-  # Single-file mode (local testing)
+Single-file mode (local testing):
   python scripts/json_to_markdown.py <input.json> <output.md>
+
+Behaviour:
+- Converts JSON recipes under data/recipes → Markdown under recipes/<category>/<slug>.md
+- Skips example files (example.json, example-*.json, _example.json)
+- Writes YAML front matter incl. tags/categories
+- CLEANS UP: deletes generated Markdown files that no longer have a source JSON
+- Prunes empty category directories after conversion
 """
-import json, sys, pathlib, re, itertools
-from typing import Iterable, Dict, Any, List
+import json, sys, pathlib, re, itertools, shutil
+from typing import Iterable, Dict, Any, List, Set
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "recipes"
@@ -24,9 +30,11 @@ def _as_list(v) -> List[str]:
     if isinstance(v, str):
         s = v.strip()
         return [s] if s else []
-    if isinstance(v, Iterable):
+    try:
+        # treat as iterable (but not str)
         return [str(x).strip() for x in v if str(x).strip()]
-    return []
+    except TypeError:
+        return []
 
 def to_slug(title: str) -> str:
     s = (title or "").lower()
@@ -40,7 +48,7 @@ def fmt_ing(i: Dict[str, Any]) -> str:
     note = str(i.get("note") or "").strip()
 
     parts = []
-    if qty: parts.append(qty)
+    if qty:  parts.append(qty)
     if unit: parts.append(unit)
     if item: parts.append(item)
     line = " ".join(parts).strip()
@@ -127,7 +135,15 @@ def render_markdown(data: Dict[str, Any]) -> str:
 
     return "\n".join(itertools.chain(fm, body)).rstrip() + "\n"
 
-# ---------------- single & batch modes ----------------
+# ---------------- conversion & cleanup ----------------
+
+def planned_output_path(data: Dict[str, Any], src: pathlib.Path) -> pathlib.Path:
+    """Compute the output path for a recipe based on categories[0] and slug."""
+    title = str(data.get("title") or src.stem).strip()
+    slug  = str(data.get("slug") or "").strip() or to_slug(title)
+    cats  = _as_list(data.get("categories"))
+    category = cats[0].lower() if cats else "uncategorised"
+    return OUT_DIR / category / f"{slug}.md"
 
 def convert_file(in_path: pathlib.Path, out_path: pathlib.Path) -> None:
     data = json.loads(in_path.read_text(encoding="utf-8"))
@@ -135,46 +151,95 @@ def convert_file(in_path: pathlib.Path, out_path: pathlib.Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(md, encoding="utf-8")
 
-def batch_convert() -> int:
+def _is_example_file(path: pathlib.Path) -> bool:
+    n = path.name.lower()
+    return n == "_example.json" or n.startswith("example")
+
+def batch_convert_and_clean() -> int:
     if not DATA_DIR.exists():
         print(f"[warn] {DATA_DIR} does not exist; nothing to do")
-        return 0
+        # Still perform cleanup (remove all generated recipes)
+        return cleanup_orphans(expected_outputs=set())
 
     json_files = sorted(DATA_DIR.rglob("*.json"))
-    # Skip example files (e.g., example.json, example-*.json, _example.json)
-    json_files = [
-        f for f in json_files
-        if not (
-            f.name.lower().startswith("example") or
-            f.name.lower() == "_example.json"
-        )
-    ]
-    if not json_files:
-        print(f"[warn] No JSON files found under {DATA_DIR}")
-        return 0
+    # Skip example files
+    json_files = [f for f in json_files if not _is_example_file(f)]
 
+    expected_outputs: Set[pathlib.Path] = set()
     ok = 0
-    for src in json_files:
-        try:
-            data = json.loads(src.read_text(encoding="utf-8"))
-            title = str(data.get("title") or "").strip()
-            slug  = str(data.get("slug") or "").strip() or to_slug(title or src.stem)
-            cats  = _as_list(data.get("categories"))
-            category = cats[0].lower() if cats else "uncategorised"
-            out_md = OUT_DIR / category / f"{slug}.md"
-            convert_file(src, out_md)
-            print(f"[ok] {src.relative_to(ROOT)} → {out_md.relative_to(ROOT)}")
-            ok += 1
-        except Exception as e:
-            print(f"[fail] {src.relative_to(ROOT)}: {e}")
-    return 0 if ok == len(json_files) else 1
+
+    if not json_files:
+        print(f"[warn] No recipe JSON files found under {DATA_DIR}")
+    else:
+        for src in json_files:
+            try:
+                data = json.loads(src.read_text(encoding="utf-8"))
+                out_md = planned_output_path(data, src)
+                convert_file(src, out_md)
+                expected_outputs.add(out_md.resolve())
+                print(f"[ok] {src.relative_to(ROOT)} → {out_md.relative_to(ROOT)}")
+                ok += 1
+            except Exception as e:
+                print(f"[fail] {src.relative_to(ROOT)}: {e}")
+
+    # Cleanup any generated files that no longer have a source
+    rc = cleanup_orphans(expected_outputs)
+    return 0 if (ok == len(json_files) and rc == 0) else 1
+
+def cleanup_orphans(expected_outputs: Set[pathlib.Path]) -> int:
+    """Delete generated Markdown files not present in expected_outputs, then
+    prune any empty directories under OUT_DIR."""
+    removed = 0
+    # Remove orphaned .md files
+    for md in OUT_DIR.rglob("*.md"):
+        if md.resolve() not in expected_outputs:
+            try:
+                md.unlink()
+                print(f"[clean] removed orphan {md.relative_to(ROOT)}")
+                removed += 1
+            except Exception as e:
+                print(f"[warn] failed to remove {md}: {e}")
+
+    # Prune empty directories (depth-first)
+    # Avoid deleting OUT_DIR itself; only children.
+    for d in sorted({p.parent for p in OUT_DIR.rglob("*") if p.is_file()}, key=lambda x: len(str(x)), reverse=True):
+        # walk up tree and remove empty dirs
+        _prune_upwards(d)
+
+    # Also scan all subdirs of OUT_DIR and prune any that are fully empty
+    for sub in sorted(OUT_DIR.glob("**/*"), key=lambda x: len(str(x)), reverse=True):
+        if sub.is_dir():
+            _try_rmdir(sub)
+
+    return 0
+
+def _prune_upwards(dirpath: pathlib.Path) -> None:
+    """Try to prune empty directories walking up until OUT_DIR."""
+    cur = dirpath
+    while cur != OUT_DIR and OUT_DIR in cur.parents:
+        if not _try_rmdir(cur):
+            break
+        cur = cur.parent
+
+def _try_rmdir(d: pathlib.Path) -> bool:
+    try:
+        # Only remove if empty
+        if d.exists() and d.is_dir() and not any(d.iterdir()):
+            d.rmdir()
+            print(f"[clean] removed empty dir {d.relative_to(ROOT)}")
+            return True
+    except Exception as e:
+        print(f"[warn] failed to remove dir {d}: {e}")
+    return False
+
+# ---------------- entrypoints ----------------
 
 def main() -> int:
     if len(sys.argv) == 1:
-        # Batch mode for CI
-        return batch_convert()
+        # Batch mode for CI (convert + cleanup)
+        return batch_convert_and_clean()
     elif len(sys.argv) == 3:
-        # Single-file mode
+        # Single-file mode (no cleanup here; just convert one file)
         in_path = pathlib.Path(sys.argv[1]).resolve()
         out_path = pathlib.Path(sys.argv[2]).resolve()
         convert_file(in_path, out_path)
