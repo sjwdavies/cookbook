@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json, re
+import textwrap
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +47,104 @@ def slugify(s: str) -> str:
 def render(md, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(md, encoding="utf-8")
+
+# --- Markdown post-processing to satisfy markdownlint (MD013, MD022, MD032) ---
+import re as _re
+
+def _wrap_list_item(line: str, width: int) -> str | None:
+    line = line.rstrip()
+    # bullets: "- " or "* "
+    if line.startswith(("- ", "* ")):
+        bullet, rest = line[:2], line[2:].strip()
+        return textwrap.fill(
+            rest,
+            width=width,
+            initial_indent=bullet,
+            subsequent_indent="  ",
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+    # numbered list: "1. ", "12. " etc.
+    m = _re.match(r"^(\s*)(\d+\. )(.+)$", line)
+    if m:
+        indent, num, rest = m.groups()
+        initial = f"{indent}{num}"
+        return textwrap.fill(
+            rest.strip(),
+            width=width,
+            initial_indent=initial,
+            subsequent_indent=" " * len(initial),
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+    return None
+
+
+def format_markdown(md: str, width: int = 80) -> str:
+    """Wrap long lines and enforce blanks around headings/lists.
+
+    - Preserves code blocks (```), tables (| ...), and headings (# ...)
+    - Wraps paragraphs and list items to a maximum width
+    - Ensures a single blank line around headings and between blocks
+    """
+    out: list[str] = []
+    in_code = False
+
+    lines = md.splitlines()
+    for line in lines:
+        raw = line.rstrip()
+
+        # toggle code block preservation
+        if raw.strip().startswith("```"):
+            in_code = not in_code
+            out.append(raw)
+            continue
+
+        if in_code:
+            out.append(raw)
+            continue
+
+        # leave GitHub-style tables alone
+        if raw.strip().startswith("|"):
+            out.append(raw)
+            continue
+
+        # Headings: ensure blank line before/after, no wrapping
+        if _re.match(r"^\s*#{1,6}\s", raw):
+            if out and out[-1] != "":
+                out.append("")
+            out.append(raw)
+            out.append("")
+            continue
+
+        # Blank lines: collapse multiples
+        if raw.strip() == "":
+            if out and out[-1] != "":
+                out.append("")
+            continue
+
+        # List items: wrap with proper hanging indent
+        wrapped_li = _wrap_list_item(raw, width)
+        if wrapped_li is not None:
+            out.append(wrapped_li)
+            continue
+
+        # Paragraph text: wrap
+        out.append(
+            textwrap.fill(
+                raw.strip(),
+                width=width,
+                break_long_words=False,
+                break_on_hyphens=False,
+            )
+        )
+
+    # de-dup trailing blanks and ensure single trailing newline
+    cleaned: list[str] = []
+    for l in out:
+        if not (cleaned and cleaned[-1] == "" and l == ""):
+            cleaned.append(l)
+    return ("\n".join(cleaned)).rstrip() + "\n"
 
 def main():
     json_files = sorted(DATA_DIR.glob("*.json"))
@@ -99,6 +198,7 @@ def main():
             na_a=fmt(obj.get("nutrition",{}).get("salt_g"), " g"),
             rda_na_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("salt_g"), "%"),
         )
+        md = format_markdown(md, width=80)
         out_path = OUT_DIR / primary / f"{obj.get('slug') or slugify(title)}.md"
         render(md, out_path)
         print("Generated", out_path)
