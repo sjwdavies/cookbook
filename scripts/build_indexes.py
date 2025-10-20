@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 from pathlib import Path
+from md_utils import rel_link
 import re, os
 
 ROOT = Path(__file__).resolve().parents[1]
 RECIPES = ROOT / "recipes"
-
-# --- helper for relative links ---
-from pathlib import Path as _Path
-def rel_link(from_file: _Path, target_rel_to_recipes: str) -> str:
-    target_abs = (RECIPES / target_rel_to_recipes).resolve()
-    start_dir = _Path(from_file).resolve().parent
-    rel = os.path.relpath(target_abs, start=start_dir)
-    return rel.replace(os.sep, "/")
 
 def load_title(path: Path) -> str:
     text = path.read_text(encoding="utf-8", errors="ignore")
