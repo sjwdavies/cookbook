@@ -105,7 +105,7 @@ def render_markdown(data: dict) -> str:
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: convert_json_to_markdown.py <input.json> <output.md>")
+        print("Usage: json_to_markdown.py <input.json> <output.md>")
         sys.exit(2)
     in_path = pathlib.Path(sys.argv[1])
     out_path = pathlib.Path(sys.argv[2])
