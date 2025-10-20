@@ -59,6 +59,26 @@ def build_category_indexes():
             old_index.unlink()
 
 
+def build_home():
+    """Create recipes/index.md as the site homepage (for docs_dir: recipes)."""
+    home_path = RECIPES / "index.md"
+    lines = [
+        "# Taylor‑Davies Family Cookbook",
+        "",
+        "- [All Recipes](./_all.md)",
+        "- [Tags](./tags.md)",
+        "",
+        "## Categories",
+        "",
+    ]
+    for cat_dir in sorted(RECIPES.iterdir()):
+        if not cat_dir.is_dir() or cat_dir.name in ("tags",):
+            continue
+        # Link to the category folder (uses category/index.md we generate)
+        lines.append(f"- [{cat_dir.name.replace('-', ' ').title()}](./{cat_dir.name}/)")
+    write(home_path, "\n".join(lines))
+
+
 def build_tags():
     """Create tags.md and tags/<tag>.md for tags that actually have recipes; delete stale tag pages."""
     tag_map: dict[str, list[Path]] = {}
@@ -102,6 +122,7 @@ def build_tags():
 def main():
     build_all()
     build_category_indexes()
+    build_home()
     build_tags()
     print("Indexes built and cleaned.")
 
