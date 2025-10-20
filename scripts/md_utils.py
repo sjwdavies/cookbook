@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Markdown utilities for formatting and link building.
+Markdown utilities for formatting and link building
 Shared by json_to_markdown.py and build_indexes.py
 """
 

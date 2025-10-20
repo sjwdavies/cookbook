@@ -57,6 +57,9 @@ def main():
     expected_paths: set[Path] = set()
 
     for js in DATA.rglob("*.json"):
+        # Skip template/example file(s)
+        if js.name.lower() == "example.json":
+            continue
         with open(js, encoding="utf-8") as f:
             obj = json.load(f)
 
