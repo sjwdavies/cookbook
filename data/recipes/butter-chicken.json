@@ -1,0 +1,114 @@
+{
+  "id": "example-0011",
+  "slug": "butter-chicken-mild",
+  "title": "Butter Chicken (Mild) ((shouldn't be here))",
+  "categories": [
+    "mid-week-meals",
+    "arthur"
+  ],
+  "serves": "2 adults + 1 child",
+  "prep_time": "15 mins",
+  "cook_time": "30 mins",
+  "equipment": [
+    "hob",
+    "frying pan",
+    "spatula"
+  ],
+  "difficulty": "Easy",
+  "tags": [
+    "chicken",
+    "quick",
+    "one-pot"
+  ],
+  "ingredients": [
+    {
+      "quantity": "400",
+      "unit": "g",
+      "item": "chicken breast",
+      "note": "diced"
+    },
+    {
+      "quantity": "1",
+      "unit": "",
+      "item": "onion",
+      "note": "finely chopped"
+    },
+    {
+      "quantity": "2",
+      "unit": "tsp",
+      "item": "mild curry powder"
+    },
+    {
+      "quantity": "1",
+      "unit": "tsp",
+      "item": "garam masala"
+    },
+    {
+      "quantity": "200",
+      "unit": "ml",
+      "item": "passata"
+    },
+    {
+      "quantity": "75",
+      "unit": "ml",
+      "item": "single cream"
+    },
+    {
+      "quantity": "20",
+      "unit": "g",
+      "item": "butter"
+    },
+    {
+      "quantity": "1",
+      "unit": "tbsp",
+      "item": "neutral oil"
+    },
+    {
+      "quantity": "to taste",
+      "unit": "",
+      "item": "salt",
+      "note": "low for children"
+    }
+  ],
+  "method": [
+    "Heat oil and butter in a pan. Soften onion 5 minutes.",
+    "Add spices; cook 1 minute until fragrant.",
+    "Add chicken; brown 5 minutes.",
+    "Add passata; simmer 15 minutes; stir in cream. Season mildly."
+  ],
+  "notes": [
+    "Serve with rice or naan.",
+    "Lower salt for child portion."
+  ],
+  "nutrition": {
+    "energy_kcal": null,
+    "protein_g": null,
+    "carbs_g": null,
+    "fat_g": null,
+    "salt_g": null
+  },
+  "audience": "child",
+  "images": [],
+  "meta": {
+    "servings": {
+      "adults": 2,
+      "children": 1,
+      "child_age_months": 18
+    },
+    "adult_rda_percent": {
+      "energy_kcal": null,
+      "protein_g": null,
+      "carbs_g": null,
+      "fat_g": null,
+      "salt_g": null
+    },
+    "child_rda_percent": {
+      "energy_kcal": null,
+      "protein_g": null,
+      "carbs_g": null,
+      "fat_g": null,
+      "salt_g": null
+    },
+    "child_rda_percent_by_band": {}
+  }
+}
