@@ -1,3 +1,3 @@
 # Mid Week Meals
 
-- [Butter Chicken (Mild)](mid-week-meals/butter-chicken-mild.md)
+- [Butter Chicken (Mild)](butter-chicken-mild.md)
