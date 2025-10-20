@@ -9,6 +9,7 @@
 - Tags: chicken, curry, weaning, no added salt, freezer friendly
 
 ## Ingredients
+
 - 1 chicken breast, skinless, boneless, diced small
 - 1 small onion, 40g, finely chopped or grated
 - 1 medium carrot, 50g, finely diced or grated
@@ -23,6 +24,7 @@
 - ¼ tsp sweet paprika, optional
 
 ## Method
+
 1. Add vegetables, fruit, and garlic to the slow cooker.
 2. Add spices or curry powder, mix well.
 3. Stir in chicken and tomatoes, then add the stock or water.
@@ -30,11 +32,13 @@
 5. Blend smooth or mash for desired texture. Optionally stir in 1 tsp plain yogurt after cooling.
 
 ## Notes
+
 - Serve alone or with soft rice or mashed potato.
 - Optional: stir in 1 tsp plain yogurt after cooling.
 - Freezes well in small portions.
 
 ## Nutrition (per adult portion)
+
 - Energy: N/A  —  % RDA (Adult): N/A
 - Protein: N/A  —  % RDA: N/A
 - Carbs: N/A  —  % RDA: N/A
