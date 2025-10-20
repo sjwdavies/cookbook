@@ -1,0 +1,38 @@
+name: Build Indexes, Tags & Ingredient Catalog
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-indexes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Generate indexes, tags and ingredient catalog
+        run: python scripts/build_indexes.py
+      - name: Commit generated pages (if any)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add recipes/_all.md            2>/dev/null || true
+            git add recipes/tags.md            2>/dev/null || true
+            git add recipes/tags/*.md          2>/dev/null || true
+            find recipes -type f -name '_index.md' -print0 | xargs -0 -r git add
+            git add -A recipes
+            git commit -m "chore: auto-update indexes, tags and ingredient catalog"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
+            git push origin "HEAD:${BRANCH}"
+          else
+            echo "No changes to commit."
+          fi

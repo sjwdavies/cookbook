@@ -1,0 +1,14 @@
+{
+  "default": true,
+  "MD033": {
+    "allowed_elements": [
+      "details",
+      "summary",
+      "kbd",
+      "sup",
+      "sub",
+      "br",
+      "img"
+    ]
+  }
+}

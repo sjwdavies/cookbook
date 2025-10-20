@@ -1,0 +1,22 @@
+site_name: Taylor-Davies Family Cookbook
+site_description: Family recipes, versioned as code
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.top
+    - toc.integrate
+    - content.code.copy
+nav:
+  - Home: index.md
+  - Recipes: index.md
+docs_dir: recipes
+extra:
+  generator: false
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - attr_list
+  - def_list
