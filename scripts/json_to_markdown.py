@@ -17,15 +17,19 @@ TEMPLATE = '''# {title}
 - Tags: {tags}
 
 ## Ingredients
+
 {ingredients_md}
 
 ## Method
+
 {method_md}
 
 ## Notes
+
 {notes_md}
 
 ## Nutrition (per adult portion)
+
 - Energy: {kcal_a}  —  % RDA (Adult): {rda_kcal_a}
 - Protein: {p_a}  —  % RDA: {rda_p_a}
 - Carbs: {c_a}  —  % RDA: {rda_c_a}
