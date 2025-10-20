@@ -65,10 +65,8 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            # Stage all recipe docs and indexes/tags
-            git add recipes/**/*.md 2>/dev/null || true
-            git add recipes/_all.md recipes/tags.md recipes/tags/*.md 2>/dev/null || true
-            find recipes -type f -name '_index.md' -print0 | xargs -0 -r git add
+            # Stage all adds, modifications, and deletions in the recipes/ tree
+            git add -A recipes
 
             git commit -m "chore: sync recipes + indexes" || echo "No changes to commit"
 
