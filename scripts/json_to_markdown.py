@@ -141,6 +141,14 @@ def batch_convert() -> int:
         return 0
 
     json_files = sorted(DATA_DIR.rglob("*.json"))
+    # Skip example files (e.g., example.json, example-*.json, _example.json)
+    json_files = [
+        f for f in json_files
+        if not (
+            f.name.lower().startswith("example") or
+            f.name.lower() == "_example.json"
+        )
+    ]
     if not json_files:
         print(f"[warn] No JSON files found under {DATA_DIR}")
         return 0
