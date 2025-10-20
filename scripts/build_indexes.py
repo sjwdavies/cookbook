@@ -26,7 +26,7 @@ def write(path: Path, content: str):
 
 
 def build_all():
-    page_path = RECIPES / "_all.md"
+    page_path = RECIPES / "all.md"
     lines = ["# All Recipes", ""]
     for p in sorted(all_recipe_files()):
         rel = p.relative_to(RECIPES)
