@@ -30,13 +30,3 @@
 ## Notes
 
 ['Serve with rice or naan.', 'Lower salt for child portion.']
-
-## Nutrition (Per Portion)
-
-| Nutrient | Amount | %RDA |
-|----------|--------|------|
-| Energy   | N/A | N/A |
-| Protein  | N/A | N/A |
-| Carbs    | N/A | N/A |
-| Fat      | N/A | N/A |
-| Salt     | N/A | N/A |
