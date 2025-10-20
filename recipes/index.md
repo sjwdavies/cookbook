@@ -1,6 +1,6 @@
 # Taylor‑Davies Family Cookbook
 
-- [All Recipes](./_all.md)
+- [All Recipes](./all.md)
 - [Tags](./tags.md)
 
 ## Categories

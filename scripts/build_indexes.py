@@ -15,7 +15,7 @@ def load_title(path: Path) -> str:
 def all_recipe_files():
     """Yield all recipe markdown files (excluding indexes and tag pages)."""
     for p in RECIPES.rglob("*.md"):
-        if p.name in ("_all.md", "tags.md") or "tags/" in str(p):
+        if p.name in ("all.md", "tags.md") or "tags/" in str(p):
             continue
         yield p
 
@@ -65,7 +65,7 @@ def build_home():
     lines = [
         "# Taylor‑Davies Family Cookbook",
         "",
-        "- [All Recipes](./_all.md)",
+        "- [All Recipes](./all.md)",
         "- [Tags](./tags.md)",
         "",
         "## Categories",

@@ -107,7 +107,7 @@ def main():
     # Cleanup: delete any recipe .md with no JSON source
     for md in RECIPES.rglob("*.md"):
         # Keep indexes and tag pages; recipes live under category folders
-        if md.name in ("_all.md", "tags.md") or md.parent.name == "tags":
+        if md.name in ("all.md", "tags.md") or md.parent.name == "tags":
             continue
         if md not in expected_paths:
             print(f"Removing stale recipe {md}")
