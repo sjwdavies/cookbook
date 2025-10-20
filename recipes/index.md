@@ -5,4 +5,6 @@
 
 ## Categories
 
+- [Arthur](./arthur/)
+- [Mid Week Meals](./mid-week-meals/)
 - [Uncategorised](./uncategorised/)
