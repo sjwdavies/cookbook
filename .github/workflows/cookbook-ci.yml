@@ -26,6 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -42,10 +44,27 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add recipes/**/*.md
-            git commit -m "chore: generate markdown from JSON"
+            git add recipes/**/*.md 2>/dev/null || true
+            git commit -m "chore: generate markdown from JSON" || echo "No changes to commit"
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
-            git push
+
+            # Rebase on latest main to avoid non-fast-forward rejections
+            git fetch origin
+            git checkout main
+            git pull --rebase origin main || true
+
+            # Push with simple retry to avoid races with parallel jobs
+            for i in 1 2 3; do
+              if git push origin main; then
+                echo "Pushed successfully."
+                exit 0
+              fi
+              echo "Push failed, refetching and rebasing… (attempt $i)"
+              git fetch origin
+              git pull --rebase origin main || true
+              sleep 2
+            done
+            echo "Failed to push after 3 attempts." && exit 1
           else
             echo "No markdown changes to commit."
           fi
@@ -56,6 +75,8 @@ jobs:
     needs: import_json
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -75,9 +96,26 @@ jobs:
             git add recipes/_all.md recipes/tags.md recipes/tags/*.md 2>/dev/null || true
             find recipes -type f -name '_index.md' -print0 | xargs -0 -r git add
             git add -A recipes
-            git commit -m "chore: auto-update indexes/tags"
+            git commit -m "chore: auto-update indexes/tags" || echo "No changes to commit"
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
-            git push
+
+            # Rebase on latest main to avoid non-fast-forward rejections
+            git fetch origin
+            git checkout main
+            git pull --rebase origin main || true
+
+            # Push with simple retry to avoid races with parallel jobs
+            for i in 1 2 3; do
+              if git push origin main; then
+                echo "Pushed successfully."
+                exit 0
+              fi
+              echo "Push failed, refetching and rebasing… (attempt $i)"
+              git fetch origin
+              git pull --rebase origin main || true
+              sleep 2
+            done
+            echo "Failed to push after 3 attempts." && exit 1
           else
             echo "No index changes to commit."
           fi
@@ -88,6 +126,8 @@ jobs:
     needs: build_indexes
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
