@@ -5,7 +5,6 @@ Outputs are **human summary → JSON → Markdown** (in that order), with a Nutr
 
 This README is self‑contained. Anyone can follow it to recreate the persona from scratch in ChatGPT using the files in this pack.
 
----
 
 ## 1) What’s in this pack?
 
@@ -30,7 +29,6 @@ taylor-davies-modular-persona-pack-v2.0/
 
 > The persona is designed to scale: add future modules (e.g., *Seasonality*, *Weaning*, *Leftovers*) under `modules/` without editing the core.
 
----
 
 ## 2) Prerequisites
 
@@ -38,7 +36,6 @@ taylor-davies-modular-persona-pack-v2.0/
 - You do **not** need any APIs or external services.  
 - (Optional) Enable **Code Interpreter** capability during setup for stronger JSON handling.
 
----
 
 ## 3) Create the persona in ChatGPT (from scratch)
 
@@ -69,7 +66,6 @@ taylor-davies-modular-persona-pack-v2.0/
 
 6. **Save** the GPT.
 
----
 
 ## 4) How it behaves (at a glance)
 
@@ -88,7 +84,6 @@ taylor-davies-modular-persona-pack-v2.0/
 - Calculates **% RDA** for **adults** and for **child age band** (if provided), and outputs a table for **all bands**.  
 - If mapping or units are uncertain → values **null** and a brief note in `meta.assumptions[]`.
 
----
 
 ## 5) Test the persona
 
@@ -102,7 +97,6 @@ taylor-davies-modular-persona-pack-v2.0/
 - JSON includes `nutrition`, `meta.adult_rda_percent`, `meta.child_rda_percent` (if age provided), `meta.child_rda_percent_by_band`, and `meta.assumptions`.  
 - Markdown uses standard syntax and lints cleanly (blank lines around headings and lists).
 
----
 
 ## 6) Troubleshooting
 
@@ -111,7 +105,6 @@ taylor-davies-modular-persona-pack-v2.0/
 - **Nutrition seems off**: Expand or correct `reference/nutrition_reference_uk_2025.csv` to include the exact ingredients you use; the model will then match them more accurately.  
 - **Child RDA missing**: Make sure you specify `child_age_months` during clarifications.
 
----
 
 ## 7) Maintaining and extending the persona
 
@@ -127,7 +120,6 @@ taylor-davies-modular-persona-pack-v2.0/
 - **Updating reference data**  
   - Add rows/columns to `reference/nutrition_reference_uk_2025.csv` (e.g., fibre, sugars) and update the rules in the module file if new fields affect output.
 
----
 
 ## 8) Optional: store this pack in your GitHub repo
 
@@ -150,12 +142,10 @@ Commit message example:
 chore(persona): add modular persona pack v2.0 (nutrition module v1.0)
 ```
 
----
 
 ## 9) License & attribution
 Use freely within the Taylor‑Davies family projects. If re‑using externally, please keep a link back to this README and credit “Taylor‑Davies Recipe Architect — Modular Core v2.0”.
 
----
 
 ### You’re ready.
 Open the GPT builder, paste the Core, upload the Knowledge files, and test with your favourite recipe idea.
