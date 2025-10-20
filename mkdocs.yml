@@ -7,9 +7,9 @@ theme:
     - navigation.top
     - toc.integrate
     - content.code.copy
-nav:
-  - Home: index.md
-  - Recipes: index.md
+#nav: // Commented out so it auto generates from the docs/ folder structure
+#  - Home: index.md
+#  - Recipes: index.md
 docs_dir: recipes
 extra:
   generator: false
