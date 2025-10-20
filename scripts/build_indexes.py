@@ -36,12 +36,12 @@ def build_all():
 
 
 def build_category_indexes():
-    """Create per-category _index.md; delete if category becomes empty."""
+    """Create per-category index.md; delete if category becomes empty."""
     for cat_dir in sorted(RECIPES.iterdir()):
         if not cat_dir.is_dir() or cat_dir.name in ("tags",):
             continue
-        recipes = [p for p in cat_dir.glob("*.md") if p.name != "_index.md"]
-        index_path = cat_dir / "_index.md"
+        recipes = [p for p in cat_dir.glob("*.md") if p.name != "index.md"]
+        index_path = cat_dir / "index.md"
         if not recipes:
             # no recipes left in this category — remove stale index
             if index_path.exists():
@@ -53,6 +53,10 @@ def build_category_indexes():
             rel = p.relative_to(RECIPES)
             lines.append(f"- [{title}]({rel_link(index_path, rel.as_posix())})")
         write(index_path, "\n".join(lines))
+        # Cleanup legacy filename if present
+        old_index = cat_dir / "_index.md"
+        if old_index.exists():
+            old_index.unlink()
 
 
 def build_tags():
