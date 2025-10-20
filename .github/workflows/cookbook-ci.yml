@@ -27,7 +27,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin
+          git checkout main
+          git pull --ff-only origin main || true
 
       - uses: actions/setup-python@v5
         with:
