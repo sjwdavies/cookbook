@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import re
-import os
+import re, os
 
 ROOT = Path(__file__).resolve().parents[1]
 RECIPES = ROOT / "recipes"
 
-# Build a markdown link path from the file being written to the target under recipes/
+# --- helper for relative links ---
 from pathlib import Path as _Path
-
 def rel_link(from_file: _Path, target_rel_to_recipes: str) -> str:
-    """Return POSIX-style relative link from `from_file` to `recipes/target_rel_to_recipes`."""
     target_abs = (RECIPES / target_rel_to_recipes).resolve()
     start_dir = _Path(from_file).resolve().parent
     rel = os.path.relpath(target_abs, start=start_dir)
@@ -23,7 +20,7 @@ def load_title(path: Path) -> str:
 
 def all_recipe_files():
     for p in RECIPES.rglob("*.md"):
-        if p.name in ("index.md", "_all.md", "tags.md") or "tags/" in str(p):
+        if p.name in ("_all.md", "tags.md") or "tags/" in str(p):
             continue
         yield p
 
@@ -38,54 +35,67 @@ def build_all():
         rel = p.relative_to(RECIPES)
         title = load_title(p)
         lines.append(f"- [{title}]({rel_link(page_path, rel.as_posix())})")
-    write(RECIPES / "_all.md", "\n".join(lines))
+    write(page_path, "\n".join(lines))
 
 def build_category_indexes():
     for cat_dir in sorted(RECIPES.iterdir()):
         if not cat_dir.is_dir() or cat_dir.name in ("tags",):
             continue
-        if not any(cat_dir.glob("*.md")):
-            continue
+        recipes = [p for p in cat_dir.glob("*.md") if p.name != "_index.md"]
         index_path = cat_dir / "_index.md"
+        if not recipes:
+            # no recipes left in this category — remove stale index
+            if index_path.exists():
+                index_path.unlink()
+            continue
         lines = [f"# {cat_dir.name.replace('-', ' ').title()}", ""]
-        for p in sorted(cat_dir.glob("*.md")):
-            if p.name in ("_index.md",):
-                continue
+        for p in sorted(recipes):
             title = load_title(p)
             rel = p.relative_to(RECIPES)
             lines.append(f"- [{title}]({rel_link(index_path, rel.as_posix())})")
-        write(cat_dir / "_index.md", "\n".join(lines))
+        write(index_path, "\n".join(lines))
 
 def build_tags():
     tag_map = {}
     for p in all_recipe_files():
         text = p.read_text(encoding="utf-8", errors="ignore")
-        m = re.search(r"^\-\s*Tags:\s*(.+)$", text, flags=re.M | re.I)
+        m = re.search(r"^-\\s*Tags:\\s*(.+)$", text, flags=re.M | re.I)
         if not m:
             continue
         tags = [t.strip().lower() for t in m.group(1).split(",") if t.strip()]
         for t in tags:
             tag_map.setdefault(t, []).append(p)
+
     tags_index = RECIPES / "tags.md"
     lines = ["# Tags", ""]
     for t in sorted(tag_map.keys()):
         lines.append(f"- [{t}]({rel_link(tags_index, f'tags/{t}.md')}) ({len(tag_map[t])})")
-    write(RECIPES / "tags.md", "\n".join(lines))
+    write(tags_index, "\n".join(lines))
+
     tag_dir = RECIPES / "tags"
+    tag_dir.mkdir(exist_ok=True)
+    existing = set(tag_dir.glob("*.md"))
+
     for t, files in tag_map.items():
-        tag_page = RECIPES / 'tags' / f"{t}.md"
+        tag_page = tag_dir / f"{t}.md"
         lines = [f"# {t.title()}", ""]
         for p in sorted(files):
             title = load_title(p)
             rel = p.relative_to(RECIPES)
             lines.append(f"- [{title}]({rel_link(tag_page, rel.as_posix())})")
-        write(tag_dir / f"{t}.md", "\n".join(lines))
+        write(tag_page, "\n".join(lines))
+        if tag_page in existing:
+            existing.remove(tag_page)
+
+    # delete tag pages that have no recipes anymore
+    for stale in existing:
+        stale.unlink()
 
 def main():
     build_all()
     build_category_indexes()
     build_tags()
-    print("Indexes built.")
+    print("Indexes built and cleaned.")
 
 if __name__ == "__main__":
     main()

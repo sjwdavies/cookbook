@@ -17,11 +17,11 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
-# Guard against endless loops when the bot commits generated files
-# (The push still triggers, but jobs skip immediately.)
 jobs:
 
   import_json:
+    # Guard against endless loops when the bot commits generated files
+    # (The push still triggers, but jobs skip immediately.)
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -40,78 +40,45 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install deps (scripts + mkdocs if needed)
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install mkdocs mkdocs-material
+          fi
+
       - name: Convert JSON → Markdown
         run: python scripts/json_to_markdown.py
 
-      - name: Commit generated Markdown (if any)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add recipes/**/*.md 2>/dev/null || true
-            git commit -m "chore: generate markdown from JSON" || echo "No changes to commit"
-            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
-
-            # Rebase on latest main to avoid non-fast-forward rejections
-            git fetch origin
-            git checkout main
-            git pull --rebase origin main || true
-
-            # Push with simple retry to avoid races with parallel jobs
-            for i in 1 2 3; do
-              if git push origin main; then
-                echo "Pushed successfully."
-                exit 0
-              fi
-              echo "Push failed, refetching and rebasing… (attempt $i)"
-              git fetch origin
-              git pull --rebase origin main || true
-              sleep 2
-            done
-            echo "Failed to push after 3 attempts." && exit 1
-          else
-            echo "No markdown changes to commit."
-          fi
-
-  build_indexes:
-    if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    needs: import_json
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Build indexes, tags and category pages
+      - name: Build indexes/tags (and cleanup)
         run: python scripts/build_indexes.py
 
-      - name: Commit indexes (if any)
+      - name: Commit generated Markdown and indexes (if any)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
+          git config --global safe.directory "$PWD"
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            # Stage all recipe docs and indexes/tags
+            git add recipes/**/*.md 2>/dev/null || true
             git add recipes/_all.md recipes/tags.md recipes/tags/*.md 2>/dev/null || true
             find recipes -type f -name '_index.md' -print0 | xargs -0 -r git add
-            git add -A recipes
-            git commit -m "chore: auto-update indexes/tags" || echo "No changes to commit"
-            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
 
-            # Rebase on latest main to avoid non-fast-forward rejections
+            git commit -m "chore: sync recipes + indexes" || echo "No changes to commit"
+
+            # Auth and rebase to avoid non-fast-forward pushes
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
             git fetch origin
             git checkout main
             git pull --rebase origin main || true
 
-            # Push with simple retry to avoid races with parallel jobs
+            # Retry push a few times in case another job raced us
             for i in 1 2 3; do
               if git push origin main; then
                 echo "Pushed successfully."
@@ -124,17 +91,24 @@ jobs:
             done
             echo "Failed to push after 3 attempts." && exit 1
           else
-            echo "No index changes to commit."
+            echo "No markdown/index changes to commit."
           fi
 
   build_site:
     if: github.actor != 'github-actions[bot]'
+    needs: import_json
     runs-on: ubuntu-latest
-    needs: build_indexes
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin
+          git checkout main
+          git pull --ff-only origin main || true
 
       - uses: actions/setup-python@v5
         with:
@@ -143,7 +117,11 @@ jobs:
       - name: Install MkDocs + theme
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install mkdocs mkdocs-material
+          fi
 
       - name: MkDocs build
         run: mkdocs build --strict
