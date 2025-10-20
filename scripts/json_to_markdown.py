@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-import json, re, textwrap, os
+# -*- coding: utf-8 -*-
+import json
+import re
+import os
 from pathlib import Path
-from md_utils import format_markdown
 
-ROOT = Path(__file__).resolve().parents[1]
+from md_utils import format_markdown, ROOT, RECIPES
+
+# Source of truth
 DATA = ROOT / "data" / "recipes"
-RECIPES = ROOT / "recipes"
 
+# Minimal template — adapt fields to your JSON schema as needed
 TEMPLATE = """# {title}
 
 - Serves: {serves}
@@ -27,86 +31,87 @@ TEMPLATE = """# {title}
 ## Notes
 
 {notes_md}
-
-## Nutrition (Per Portion)
-
-| Nutrient | Amount | %RDA |
-|----------|--------|------|
-| Energy   | {kcal_a} | {rda_kcal_a} |
-| Protein  | {p_a} | {rda_p_a} |
-| Carbs    | {c_a} | {rda_c_a} |
-| Fat      | {f_a} | {rda_f_a} |
-| Salt     | {na_a} | {rda_na_a} |
 """
 
-def render(md, path):
+
+def render(md: str, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(md, encoding="utf-8")
 
-def fmt(val, suffix=""):
+
+def _fmt(val, suffix: str = "") -> str:
     if val is None or val == "":
         return "N/A"
     return f"{val}{suffix}"
 
-md = format_markdown(md, width=80)
+
+def _slug_from_title(title: str) -> str:
+    s = re.sub(r"[^a-zA-Z0-9 -]", "", title).strip().lower()
+    s = re.sub(r"\s+", "-", s)
+    s = re.sub(r"-+", "-", s)
+    return s
+
 
 def main():
-    # collect expected markdown paths
-    expected_paths = set()
+    # Track the markdown files we expect (to delete stale ones later)
+    expected_paths: set[Path] = set()
 
     for js in DATA.rglob("*.json"):
         with open(js, encoding="utf-8") as f:
             obj = json.load(f)
-        title = obj["title"]
-        category = obj.get("category", "uncategorised").lower().replace(" ", "-")
-        slug = obj.get("slug") or js.stem.lower().replace(" ", "-")
+
+        title = obj.get("title") or js.stem.replace("-", " ").title()
+        category = (obj.get("category") or "uncategorised").strip().lower().replace(" ", "-")
+        slug = (obj.get("slug") or _slug_from_title(title)).lower()
+
         out_path = RECIPES / category / f"{slug}.md"
         expected_paths.add(out_path)
 
-        # ingredients
+        # Ingredients
         ingredients = obj.get("ingredients", [])
         ingredients_md = "\n".join(f"- {i}" for i in ingredients) or "N/A"
 
-        # method
+        # Method
         method = obj.get("method", [])
         method_md = "\n".join(f"{i+1}. {step}" for i, step in enumerate(method)) or "N/A"
 
+        # Notes
         notes_md = obj.get("notes", "N/A")
+
+        # Equipment list to CSV
+        equipment_csv = ", ".join(obj.get("equipment", [])) or "N/A"
+
+        # Tags list to CSV (lowercase for consistency with index builder)
+        tags_csv = ", ".join([str(t).strip().lower() for t in obj.get("tags", [])]) or "N/A"
 
         md = TEMPLATE.format(
             title=title,
-            primary_category=category,
-            serves=obj.get("serves","N/A"),
-            prep_time=obj.get("prep_time","N/A"),
-            cook_time=obj.get("cook_time","N/A"),
-            equipment=", ".join(obj.get("equipment", [])) or "N/A",
-            difficulty=obj.get("difficulty","Easy"),
-            tags=", ".join(obj.get("tags", [])) or "N/A",
+            serves=obj.get("serves", "N/A"),
+            prep_time=obj.get("prep_time", "N/A"),
+            cook_time=obj.get("cook_time", "N/A"),
+            equipment=equipment_csv,
+            difficulty=obj.get("difficulty", "Easy"),
+            tags=tags_csv,
             ingredients_md=ingredients_md,
             method_md=method_md,
             notes_md=notes_md,
-            kcal_a=fmt(obj.get("nutrition",{}).get("energy_kcal"), " kcal"),
-            rda_kcal_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("energy_kcal"), "%"),
-            p_a=fmt(obj.get("nutrition",{}).get("protein_g"), " g"),
-            rda_p_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("protein_g"), "%"),
-            c_a=fmt(obj.get("nutrition",{}).get("carbs_g"), " g"),
-            rda_c_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("carbs_g"), "%"),
-            f_a=fmt(obj.get("nutrition",{}).get("fat_g"), " g"),
-            rda_f_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("fat_g"), "%"),
-            na_a=fmt(obj.get("nutrition",{}).get("salt_g"), " g"),
-            rda_na_a=fmt(obj.get("meta",{}).get("adult_rda_percent",{}).get("salt_g"), "%"),
         )
 
+        # Wrap to satisfy markdownlint (MD013 etc.)
         md = format_markdown(md, width=80)
         render(md, out_path)
 
-    # cleanup: delete any .md in recipes/ with no JSON source
+    # Cleanup: delete any recipe .md with no JSON source
     for md in RECIPES.rglob("*.md"):
+        # Keep indexes and tag pages; recipes live under category folders
         if md.name in ("_all.md", "tags.md") or md.parent.name == "tags":
             continue
         if md not in expected_paths:
             print(f"Removing stale recipe {md}")
-            md.unlink()
+            md.unlink(missing_ok=True)
+
+    print("JSON → Markdown sync complete; stale recipes removed.")
+
 
 if __name__ == "__main__":
     main()
