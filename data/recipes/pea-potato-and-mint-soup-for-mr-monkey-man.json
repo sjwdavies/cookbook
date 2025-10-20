@@ -1,22 +1,63 @@
 {
-  "title": "Pea, Potato & Mint Soup (for Mr Monkey Man)",
+  "id": null,
   "slug": "pea-potato-and-mint-soup-for-mr-monkey-man",
-  "servings": 6,
-  "categories": ["arthur", "batch-freezer", "weaning"],
-  "timing": {
-    "prep": 10,
-    "cook": 25
-  },
-  "ingredients": [
-    { "quantity": 1, "unit": "tsp", "item": "olive oil", "note": "or unsalted butter" },
-    { "quantity": 1, "unit": "", "item": "small onion", "note": "chopped" },
-    { "quantity": 2, "unit": "medium", "item": "potatoes", "note": "peeled and diced (≈300 g)" },
-    { "quantity": 300, "unit": "g", "item": "frozen peas" },
-    { "quantity": 500, "unit": "ml", "item": "low-sodium vegetable stock", "note": "or water" },
-    { "quantity": 4, "unit": "leaves", "item": "fresh mint", "note": "optional" },
-    { "quantity": 50, "unit": "ml", "item": "whole milk", "note": "or formula, added after cooking" }
+  "title": "Pea, Potato & Mint Soup (for Mr Monkey Man)",
+  "categories": [
+    "arthur",
+    "batch-freezer",
+    "weaning"
   ],
-  "steps": [
+  "serves": "6",
+  "prep_time": "10 mins",
+  "cook_time": "25 mins",
+  "equipment": [],
+  "difficulty": null,
+  "tags": [],
+  "ingredients": [
+    {
+      "quantity": "1",
+      "unit": "tsp",
+      "item": "olive oil",
+      "note": "or unsalted butter"
+    },
+    {
+      "quantity": "1",
+      "unit": "",
+      "item": "small onion",
+      "note": "chopped"
+    },
+    {
+      "quantity": "2",
+      "unit": "medium",
+      "item": "potatoes",
+      "note": "peeled and diced (≈300 g)"
+    },
+    {
+      "quantity": "300",
+      "unit": "g",
+      "item": "frozen peas",
+      "note": null
+    },
+    {
+      "quantity": "500",
+      "unit": "ml",
+      "item": "low-sodium vegetable stock",
+      "note": "or water"
+    },
+    {
+      "quantity": "4",
+      "unit": "leaves",
+      "item": "fresh mint",
+      "note": "optional"
+    },
+    {
+      "quantity": "50",
+      "unit": "ml",
+      "item": "whole milk",
+      "note": "or formula, added after cooking"
+    }
+  ],
+  "method": [
     "Add the oil or butter to the soup maker jug.",
     "Add onion, potato, peas, and stock (or water).",
     "Cook on smooth soup cycle (≈25 minutes) until vegetables are soft.",
@@ -25,31 +66,36 @@
     "Cool completely before portioning into 100 ml freezer pots.",
     "Freeze for up to 2 months or keep in the fridge for 3 days."
   ],
+  "notes": [],
   "nutrition": {
     "energy_kcal": 72,
     "protein_g": 3.2,
-    "carbohydrates_g": 10.1,
+    "carbs_g": null,
     "fat_g": 1.9,
     "salt_g": 0.05
   },
+  "audience": null,
+  "images": [],
   "meta": {
+    "servings": {
+      "adults": null,
+      "children": null,
+      "child_age_months": null
+    },
     "adult_rda_percent": {
-      "energy": 4,
-      "protein": 6,
-      "carbohydrates": 3,
-      "fat": 3,
-      "salt": 1
+      "energy_kcal": null,
+      "protein_g": null,
+      "carbs_g": null,
+      "fat_g": null,
+      "salt_g": null
     },
     "child_rda_percent": {
-      "energy": 8,
-      "protein": 12,
-      "carbohydrates": 7,
-      "fat": 5,
-      "salt": 1
+      "energy_kcal": null,
+      "protein_g": null,
+      "carbs_g": null,
+      "fat_g": null,
+      "salt_g": null
     },
-    "child_rda_percent_by_band": {
-      "6-12m": { "energy": 8, "protein": 12, "carbohydrates": 7, "fat": 5, "salt": 1 }
-    },
-    "assumptions": "Nutrition calculated using UK reference 2025 dataset; milk added post-cook not boiled; no added salt or spice."
+    "child_rda_percent_by_band": {}
   }
 }
