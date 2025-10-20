@@ -4,5 +4,3 @@
 - [Tags](./tags.md)
 
 ## Categories
-
-- [Uncategorised](./uncategorised/)
