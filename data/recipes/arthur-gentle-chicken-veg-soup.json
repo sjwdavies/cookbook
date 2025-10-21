@@ -1,6 +1,6 @@
 {
   "slug": "arthur-gentle-chicken-veg-soup",
-  "title": "Arthur’s Gentle Chicken & Veg Soup :)",
+  "title": "Arthur’s Gentle Chicken & Veg Soup",
   "categories": [
     "arthur",
     "weaning",
@@ -29,7 +29,7 @@
       "note": "skinless, diced"
     },
     {
-      "quantity": "100000",
+      "quantity": "100",
       "unit": "g",
       "item": "potato",
       "note": "peeled, chopped"
