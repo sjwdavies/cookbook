@@ -1,0 +1,163 @@
+{
+  "slug": "arthur-gentle-chicken-veg-soup",
+  "title": "Arthur’s Gentle Chicken & Veg Soup",
+  "categories": [
+    "arthur",
+    "weaning",
+    "soups"
+  ],
+  "serves": "4–5 baby portions",
+  "prep_time": "10 min",
+  "cook_time": "25 min",
+  "equipment": [
+    "soup maker",
+    "knife",
+    "chopping board"
+  ],
+  "difficulty": "easy",
+  "tags": [
+    "weaning",
+    "no added salt",
+    "chicken",
+    "soup maker"
+  ],
+  "ingredients": [
+    {
+      "quantity": "100",
+      "unit": "g",
+      "item": "chicken breast",
+      "note": "skinless, diced"
+    },
+    {
+      "quantity": "100",
+      "unit": "g",
+      "item": "potato",
+      "note": "peeled, chopped"
+    },
+    {
+      "quantity": "60",
+      "unit": "g",
+      "item": "carrot",
+      "note": "peeled, chopped"
+    },
+    {
+      "quantity": "25",
+      "unit": "g",
+      "item": "leek",
+      "note": "washed, sliced"
+    },
+    {
+      "quantity": "50",
+      "unit": "g",
+      "item": "courgette",
+      "note": "chopped"
+    },
+    {
+      "quantity": "1",
+      "unit": "tsp",
+      "item": "olive oil",
+      "note": "for sautéing"
+    },
+    {
+      "quantity": "350",
+      "unit": "ml",
+      "item": "water",
+      "note": "no stock cubes"
+    },
+    {
+      "quantity": null,
+      "unit": "pinch",
+      "item": "fresh parsley or thyme",
+      "note": "optional aroma only"
+    }
+  ],
+  "method": [
+    "Prepare all vegetables, chopping into small pieces suitable for the soup maker.",
+    "Add olive oil, then the chicken and all vegetables to the soup maker.",
+    "Pour in water to reach the minimum fill line.",
+    "Select the smooth soup or blend program and cook (~25 min).",
+    "Check texture — it should be soft and lightly blended.",
+    "If too thick, add a splash of boiled water and blend briefly.",
+    "Cool before serving; test temperature carefully before offering to Arthur."
+  ],
+  "notes": [
+    "Freeze in small portions or ice cube trays for up to 2 months.",
+    "Defrost overnight in the fridge and reheat until piping hot, then cool before serving.",
+    "No salt, stock cubes, or honey.",
+    "Batch-friendly and ideal for easy lunches."
+  ],
+  "nutrition": {
+    "energy_kcal": 65,
+    "protein_g": 5.5,
+    "carbs_g": 4.6,
+    "fat_g": 2.4,
+    "salt_g": 0.03
+  },
+  "audience": "Arthur (7–12 months, weaning)",
+  "meta": {
+    "servings": {
+      "adults": null,
+      "children": 5,
+      "child_age_months": 10
+    },
+    "adult_rda_percent": {
+      "energy_kcal": 3.0,
+      "protein_g": 11.0,
+      "carbs_g": 1.8,
+      "fat_g": 3.4,
+      "salt_g": 0.5
+    },
+    "child_rda_percent": {
+      "energy_kcal": 4.5,
+      "protein_g": 9.2,
+      "carbs_g": 4.8,
+      "fat_g": 3.9,
+      "salt_g": 3.0
+    },
+    "child_rda_percent_by_band": {
+      "6–12m": {
+        "energy_kcal": 4.5,
+        "protein_g": 9.2,
+        "carbs_g": 4.8,
+        "fat_g": 3.9,
+        "salt_g": 3.0
+      },
+      "1–3y": {
+        "energy_kcal": 2.8,
+        "protein_g": 7.9,
+        "carbs_g": 3.5,
+        "fat_g": 3.2,
+        "salt_g": 1.5
+      },
+      "4–6y": {
+        "energy_kcal": 2.0,
+        "protein_g": 5.5,
+        "carbs_g": 2.3,
+        "fat_g": 2.6,
+        "salt_g": 1.0
+      },
+      "7–10y": {
+        "energy_kcal": 1.7,
+        "protein_g": 3.9,
+        "carbs_g": 1.8,
+        "fat_g": 2.0,
+        "salt_g": 0.6
+      },
+      "11–14y": {
+        "energy_kcal": 1.5,
+        "protein_g": 2.9,
+        "carbs_g": 1.7,
+        "fat_g": 1.7,
+        "salt_g": 0.5
+      }
+    },
+    "child_age_band": "6–12m",
+    "assumptions": [
+      "Chicken breast matched to 'chicken, breast, cooked, skinless' baseline.",
+      "Olive oil assumed 5 g per tsp.",
+      "All vegetables matched to fresh raw equivalents.",
+      "Soup volume divided evenly into 5 baby portions.",
+      "RDA from UK 2025 values for 7–12 months band."
+    ]
+  }
+}
