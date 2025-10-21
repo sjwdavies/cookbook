@@ -1,5 +1,5 @@
 ---
-title: "Arthur’s Gentle Chicken & Veg Soup"
+title: "Arthur’s Gentle Chicken & Veg Soup :)"
 slug: "arthur-gentle-chicken-veg-soup"
 categories:
   - arthur
@@ -12,12 +12,13 @@ tags:
   - soup maker
 audience: Arthur (7–12 months, weaning)
 source: "/home/runner/work/cookbook/cookbook/data/recipes/arthur-gentle-chicken-veg-soup.json"
+source_digest: 4e16feaf3582c610b670afcdfa89f5fb8694dc5bbcdbd5f25ee8428434e5e9fa
 ---
 
 ## Ingredients
 
 - 100 g chicken breast, skinless, diced
-- 100 g potato, peeled, chopped
+- 100000 g potato, peeled, chopped
 - 60 g carrot, peeled, chopped
 - 25 g leek, washed, sliced
 - 50 g courgette, chopped

@@ -10,6 +10,7 @@ tags:
   - "one-pot"
 audience: child
 source: /home/runner/work/cookbook/cookbook/data/recipes/example.json
+source_digest: e84a2e3c7fb67208cad0ddc3dc50409e450559110d8f8bf479e748ebed8e102f
 ---
 
 ## Ingredients
