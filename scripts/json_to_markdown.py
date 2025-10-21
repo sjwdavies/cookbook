@@ -1,253 +1,254 @@
 #!/usr/bin/env python3
 """
-json_to_markdown.py
+json_to_markdown.py - drop-in replacement
+Adds Nutrition tables to generated Markdown from recipe JSON.
 
-Batch mode (CI):
+Usage:
+  # Batch (default): convert all JSON under data/recipes to recipes/<cat>/<slug>.md
   python scripts/json_to_markdown.py
 
-Single-file mode (local testing):
-  python scripts/json_to_markdown.py <input.json> <output.md>
-
-Behaviour:
-- Converts JSON recipes under data/recipes → Markdown under recipes/<category>/<slug>.md
-- Skips example files (example.json, example-*.json, _example.json)
-- Writes YAML front matter incl. tags/categories
-- CLEANS UP: deletes generated Markdown files that no longer have a source JSON
-- Prunes empty category directories after conversion
+  # Single file:
+  python scripts/json_to_markdown.py data/recipes/foo.json recipes/<cat>/foo.md
 """
-import json, sys, pathlib, re, itertools, shutil
-from typing import Iterable, Dict, Any, List, Set
+from __future__ import annotations
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "data" / "recipes"
-OUT_DIR = ROOT / "recipes"
+import json
+import sys
+import re
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# ---------------- formatting helpers ----------------
+# ---------- Helpers ----------
 
-def _as_list(v) -> List[str]:
+def kebab(s: str) -> str:
+    s = s.strip().lower()
+    s = re.sub(r"[^a-z0-9\s\-]", "", s)
+    s = re.sub(r"[\s_]+", "-", s)
+    s = re.sub(r"-{2,}", "-", s).strip("-")
+    return s or "recipe"
+
+def ensure_blank_line(lines: List[str]) -> None:
+    if lines and lines[-1].strip() != "":
+        lines.append("")
+
+def yaml_escape(v: str) -> str:
+    # Quote if needed
     if v is None:
-        return []
-    if isinstance(v, str):
-        s = v.strip()
-        return [s] if s else []
-    try:
-        # treat as iterable (but not str)
-        return [str(x).strip() for x in v if str(x).strip()]
-    except TypeError:
-        return []
-
-def to_slug(title: str) -> str:
-    s = (title or "").lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    return s or "untitled"
-
-def fmt_ing(i: Dict[str, Any]) -> str:
-    qty  = str(i.get("quantity") or "").strip()
-    unit = str(i.get("unit") or "").strip()
-    item = str(i.get("item") or "").strip()
-    note = str(i.get("note") or "").strip()
-
-    parts = []
-    if qty:  parts.append(qty)
-    if unit: parts.append(unit)
-    if item: parts.append(item)
-    line = " ".join(parts).strip()
-    if note:
-        line += f" ({note})"
-    return f"- {line or '_unspecified_'}"
-
-def list_block(title: str, items: Iterable[str]) -> str:
-    items = [str(x).strip() for x in items if str(x).strip()]
-    if not items:
         return ""
-    out = [f"## {title}"]
-    out.extend(f"- {x}" for x in items)
-    out.append("")  # trailing newline
-    return "\n".join(out)
+    if isinstance(v, (int, float)):
+        return str(v)
+    s = str(v)
+    if any(ch in s for ch in [":", "-", "{", "}", "[", "]", "#", "\"", "'", "<", ">", "&"]):
+        return json.dumps(s, ensure_ascii=False)
+    return s
+
+def fmt_num(val: Optional[float], dp_default: int = 1) -> str:
+    if val is None:
+        return "—"
+    try:
+        if abs(val - round(val)) < 1e-9:
+            return str(int(round(val)))
+        if dp_default == 2:
+            return f"{val:.2f}"
+        return f"{val:.1f}"
+    except Exception:
+        return "—"
+
+# ---------- Rendering ----------
+
+def to_yaml_front_matter(data: Dict[str, Any]) -> List[str]:
+    title = str(data.get("title") or "").strip()
+    slug = str(data.get("slug") or kebab(title))
+    cats = data.get("categories") or []
+    if isinstance(cats, str):
+        cats = [cats]
+    tags = data.get("tags") or []
+    audience = data.get("audience") or ""
+
+    fm: List[str] = []
+    fm.append("---")
+    fm.append(f"title: {yaml_escape(title)}")
+    fm.append(f"slug: {yaml_escape(slug)}")
+    if cats:
+        fm.append("categories:")
+        for c in cats:
+            fm.append(f"  - {yaml_escape(str(c))}")
+    if tags:
+        fm.append("tags:")
+        for t in tags:
+            fm.append(f"  - {yaml_escape(str(t))}")
+    if audience:
+        fm.append(f"audience: {yaml_escape(audience)}")
+    source = data.get("_source_path") or ""
+    if source:
+        fm.append(f"source: {yaml_escape(source)}")
+    fm.append("---")
+    fm.append("")
+    return fm
+
+def render_section_ingredients(data: Dict[str, Any]) -> List[str]:
+    lines: List[str] = []
+    lines.append("## Ingredients")
+    lines.append("")
+    ings = data.get("ingredients") or []
+    for it in ings:
+        qty = str(it.get("quantity") or "").strip()
+        unit = str(it.get("unit") or "").strip()
+        item = str(it.get("item") or "").strip()
+        note = str(it.get("note") or "").strip()
+        left = " ".join([p for p in [qty, unit] if p]).strip()
+        label = f"- {left} {item}".strip()
+        lines.append(label if not note else f"{label}, {note}")
+    lines.append("")
+    return lines
+
+def render_section_method(data: Dict[str, Any]) -> List[str]:
+    lines: List[str] = []
+    lines.append("## Method")
+    lines.append("")
+    steps = data.get("method") or []
+    for i, step in enumerate(steps, 1):
+        s = str(step).strip()
+        lines.append(f"{i}. {s}")
+    lines.append("")
+    return lines
+
+def render_section_notes(data: Dict[str, Any]) -> List[str]:
+    notes = data.get("notes") or []
+    if not notes:
+        return []
+    lines: List[str] = []
+    lines.append("## Notes")
+    lines.append("")
+    for n in notes:
+        s = str(n).strip()
+        lines.append(f"- {s}")
+    lines.append("")
+    return lines
+
+def render_nutrition_blocks(data: Dict[str, Any]) -> List[str]:
+    nutrition = data.get("nutrition") or {}
+    if not isinstance(nutrition, dict) or not nutrition:
+        return []
+    meta = data.get("meta") or {}
+    adult = meta.get("adult_rda_percent") or {}
+    child = meta.get("child_rda_percent") or {}
+    child_band = (meta.get("child_age_band") or "").strip()
+    by_band = meta.get("child_rda_percent_by_band") or {}
+
+    lines: List[str] = []
+    # Per adult portion table
+    lines.append("## Nutrition (per adult portion)")
+    lines.append("")
+    hdr_child = f"Child %RDA ({child_band})" if child_band else "Child %RDA"
+    lines.append(f"| Nutrient | Amount | Adult %RDA | {hdr_child} |")
+    lines.append("|---|---:|---:|---:|")
+
+    def row(key: str, label: str, unit: str = ""):
+        amt = nutrition.get(key, None)
+        a = adult.get(key, None)
+        c = child.get(key, None)
+        val = fmt_num(amt, 0 if key == "energy_kcal" else (2 if key == "salt_g" else 1))
+        if unit and val != "—":
+            val = f"{val} {unit}"
+        lines.append(f"| {label} | {val} | {fmt_num(a)} | {fmt_num(c)} |")  # noqa: E501
+
+    row("energy_kcal", "Energy (kcal)")
+    row("protein_g", "Protein (g)")
+    row("carbs_g", "Carbs (g)")
+    row("fat_g", "Fat (g)")
+    row("salt_g", "Salt (g)")
+    lines.append("")
+
+    # Child RDA by band reference table
+    if isinstance(by_band, dict) and by_band:
+        lines.append("## Child RDA by band (reference)")
+        lines.append("")
+        lines.append("| Band | Energy % | Protein % | Carbs % | Fat % | Salt % |")
+        lines.append("|---|---:|---:|---:|---:|---:|")
+        for band, vals in by_band.items():
+            e = fmt_num(vals.get("energy_kcal"))
+            p = fmt_num(vals.get("protein_g"))
+            c = fmt_num(vals.get("carbs_g"))
+            f = fmt_num(vals.get("fat_g"))
+            s = fmt_num(vals.get("salt_g"))
+            lines.append(f"| {band} | {e} | {p} | {c} | {f} | {s} |")
+        lines.append("")
+    return lines
 
 def render_markdown(data: Dict[str, Any]) -> str:
     title = str(data.get("title") or "").strip()
     if not title:
         raise ValueError("Recipe must include a non-empty 'title'")
+    slug = str(data.get("slug") or kebab(title))
+    data["slug"] = slug  # persist for path decision
 
-    slug = str(data.get("slug") or "").strip() or to_slug(title)
-
-    serves     = str(data.get("serves") or "").strip()
-    prep_time  = str(data.get("prep_time") or "").strip()
-    cook_time  = str(data.get("cook_time") or "").strip()
-    difficulty = str(data.get("difficulty") or "").strip()
-
-    equipment  = _as_list(data.get("equipment"))
-    tags       = _as_list(data.get("tags"))
-    categories = _as_list(data.get("categories"))
-
-    ingredients = data.get("ingredients") or []
-    if not isinstance(ingredients, list):
-        raise ValueError("'ingredients' must be a list")
-    method = data.get("method") or []
-    if not isinstance(method, list):
-        raise ValueError("'method' must be a list")
-    notes  = _as_list(data.get("notes"))
-
-    # ---------- YAML front matter ----------
-    fm = ["---",
-          f'title: "{title.replace(chr(34), "\\\"")}"',
-          f"slug: {slug}"]
-    if serves:     fm.append(f'serves: "{serves}"')
-    if prep_time:  fm.append(f'prep_time: "{prep_time}"')
-    if cook_time:  fm.append(f'cook_time: "{cook_time}"')
-    if difficulty: fm.append(f'difficulty: "{difficulty}"')
-
-    if equipment:
-        fm.append("equipment:")
-        fm.extend(f"  - {e}" for e in equipment)
-    if tags:
-        fm.append("tags:")
-        fm.extend(f"  - {t}" for t in tags)
-    if categories:
-        fm.append("categories:")
-        fm.extend(f"  - {c}" for c in categories)
-    fm.append("---\n")
-
-    # ---------- Body ----------
-    bullets = []
-    if serves:     bullets.append(f"- Serves: {serves}")
-    if prep_time:  bullets.append(f"- Prep Time: {prep_time}")
-    if cook_time:  bullets.append(f"- Cook Time: {cook_time}")
-    if equipment:  bullets.append(f"- Equipment: {', '.join(equipment)}")
-    if difficulty: bullets.append(f"- Difficulty: {difficulty}")
-    if tags:       bullets.append(f"- Tags: {', '.join(tags)}")
-
+    fm = to_yaml_front_matter(data)
     body: List[str] = []
-    if bullets:
-        body.append("\n".join(bullets) + "\n")
 
-    body.append("## Ingredients")
-    if ingredients:
-        body.extend(fmt_ing(i) for i in ingredients)
+    # Summary (optional)
+    summary = str(data.get("summary") or "").strip()
+    if summary:
+        body.append(summary)
+        body.append("")
+
+    body.extend(render_section_ingredients(data))
+    body.extend(render_section_method(data))
+    body.extend(render_section_notes(data))
+
+    # Nutrition
+    nut = render_nutrition_blocks(data)
+    if nut:
+        ensure_blank_line(body)
+        body.extend(nut)
+
+    return "\n".join(fm + body)
+
+# ---------- IO / CLI ----------
+
+def write_markdown(md_path: Path, content: str) -> None:
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+    md_path.write_text(content, encoding="utf-8")
+
+def convert_file(json_path: Path, out_root: Path) -> Path:
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    data["_source_path"] = str(json_path)
+    # compute category folder
+    cats = data.get("categories") or []
+    if isinstance(cats, list) and cats:
+        cat = kebab(str(cats[0]))
+    elif isinstance(cats, str) and cats:
+        cat = kebab(cats)
     else:
-        body.append("_No ingredients listed._")
-    body.append("")
+        cat = "uncategorised"
+    slug = data.get("slug") or kebab(str(data.get("title","untitled")))
+    out_md = out_root / cat / f"{slug}.md"
+    content = render_markdown(data)
+    write_markdown(out_md, content)
+    return out_md
 
-    body.append(list_block("Method", method))
-    if notes:
-        body.append(list_block("Notes", notes))
+def batch_convert(repo_root: Path) -> None:
+    data_dir = repo_root / "data" / "recipes"
+    out_root = repo_root / "recipes"
+    json_files = sorted(data_dir.glob("*.json"))
+    for jf in json_files:
+        md_path = convert_file(jf, out_root)
+        print(f"✓ {jf.name} -> {md_path.relative_to(repo_root)}")
 
-    return "\n".join(itertools.chain(fm, body)).rstrip() + "\n"
-
-# ---------------- conversion & cleanup ----------------
-
-def planned_output_path(data: Dict[str, Any], src: pathlib.Path) -> pathlib.Path:
-    """Compute the output path for a recipe based on categories[0] and slug."""
-    title = str(data.get("title") or src.stem).strip()
-    slug  = str(data.get("slug") or "").strip() or to_slug(title)
-    cats  = _as_list(data.get("categories"))
-    category = cats[0].lower() if cats else "uncategorised"
-    return OUT_DIR / category / f"{slug}.md"
-
-def convert_file(in_path: pathlib.Path, out_path: pathlib.Path) -> None:
-    data = json.loads(in_path.read_text(encoding="utf-8"))
-    md = render_markdown(data)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(md, encoding="utf-8")
-
-def _is_example_file(path: pathlib.Path) -> bool:
-    n = path.name.lower()
-    return n == "_example.json" or n.startswith("example")
-
-def batch_convert_and_clean() -> int:
-    if not DATA_DIR.exists():
-        print(f"[warn] {DATA_DIR} does not exist; nothing to do")
-        # Still perform cleanup (remove all generated recipes)
-        return cleanup_orphans(expected_outputs=set())
-
-    json_files = sorted(DATA_DIR.rglob("*.json"))
-    # Skip example files
-    json_files = [f for f in json_files if not _is_example_file(f)]
-
-    expected_outputs: Set[pathlib.Path] = set()
-    ok = 0
-
-    if not json_files:
-        print(f"[warn] No recipe JSON files found under {DATA_DIR}")
-    else:
-        for src in json_files:
-            try:
-                data = json.loads(src.read_text(encoding="utf-8"))
-                out_md = planned_output_path(data, src)
-                convert_file(src, out_md)
-                expected_outputs.add(out_md.resolve())
-                print(f"[ok] {src.relative_to(ROOT)} → {out_md.relative_to(ROOT)}")
-                ok += 1
-            except Exception as e:
-                print(f"[fail] {src.relative_to(ROOT)}: {e}")
-
-    # Cleanup any generated files that no longer have a source
-    rc = cleanup_orphans(expected_outputs)
-    return 0 if (ok == len(json_files) and rc == 0) else 1
-
-def cleanup_orphans(expected_outputs: Set[pathlib.Path]) -> int:
-    """Delete generated Markdown files not present in expected_outputs, then
-    prune any empty directories under OUT_DIR."""
-    removed = 0
-    # Remove orphaned .md files
-    for md in OUT_DIR.rglob("*.md"):
-        if md.resolve() not in expected_outputs:
-            try:
-                md.unlink()
-                print(f"[clean] removed orphan {md.relative_to(ROOT)}")
-                removed += 1
-            except Exception as e:
-                print(f"[warn] failed to remove {md}: {e}")
-
-    # Prune empty directories (depth-first)
-    # Avoid deleting OUT_DIR itself; only children.
-    for d in sorted({p.parent for p in OUT_DIR.rglob("*") if p.is_file()}, key=lambda x: len(str(x)), reverse=True):
-        # walk up tree and remove empty dirs
-        _prune_upwards(d)
-
-    # Also scan all subdirs of OUT_DIR and prune any that are fully empty
-    for sub in sorted(OUT_DIR.glob("**/*"), key=lambda x: len(str(x)), reverse=True):
-        if sub.is_dir():
-            _try_rmdir(sub)
-
+def main(argv: List[str]) -> int:
+    repo_root = Path(__file__).resolve().parents[1]
+    if len(argv) == 3:
+        inp = Path(argv[1])
+        outp = Path(argv[2])
+        data = json.loads(inp.read_text(encoding="utf-8"))
+        data["_source_path"] = str(inp)
+        content = render_markdown(data)
+        write_markdown(outp, content)
+        print(f"✓ Wrote {outp}")
+        return 0
+    # default to batch mode within repo
+    batch_convert(repo_root)
     return 0
 
-def _prune_upwards(dirpath: pathlib.Path) -> None:
-    """Try to prune empty directories walking up until OUT_DIR."""
-    cur = dirpath
-    while cur != OUT_DIR and OUT_DIR in cur.parents:
-        if not _try_rmdir(cur):
-            break
-        cur = cur.parent
-
-def _try_rmdir(d: pathlib.Path) -> bool:
-    try:
-        # Only remove if empty
-        if d.exists() and d.is_dir() and not any(d.iterdir()):
-            d.rmdir()
-            print(f"[clean] removed empty dir {d.relative_to(ROOT)}")
-            return True
-    except Exception as e:
-        print(f"[warn] failed to remove dir {d}: {e}")
-    return False
-
-# ---------------- entrypoints ----------------
-
-def main() -> int:
-    if len(sys.argv) == 1:
-        # Batch mode for CI (convert + cleanup)
-        return batch_convert_and_clean()
-    elif len(sys.argv) == 3:
-        # Single-file mode (no cleanup here; just convert one file)
-        in_path = pathlib.Path(sys.argv[1]).resolve()
-        out_path = pathlib.Path(sys.argv[2]).resolve()
-        convert_file(in_path, out_path)
-        print(f"[ok] {in_path} → {out_path}")
-        return 0
-    else:
-        print("Usage: json_to_markdown.py <input.json> <output.md>")
-        return 2
-
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main(sys.argv))
