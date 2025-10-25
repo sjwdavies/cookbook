@@ -1,5 +1,5 @@
 ---
-title: Leek and Potato Soup for Arthur
+title: "Leek and Potato Soup for Arthur ;-)"
 slug: "leek-and-potato-soup-for-arthur"
 categories:
   - Arthur
@@ -11,7 +11,7 @@ tags:
   - "no-added-salt"
 audience: Arthur (7–12 months)
 source: "/home/runner/work/cookbook/cookbook/data/recipes/leek-and-potato-soup-for-arthur.json"
-source_digest: 21f8da16f638758141a6a5c8debcf590ba659f534ffc46431caf7ca14016b1af
+source_digest: 49986c9e75b3ca3948846dc9bafe442d0fde5a31b2411aa00f4e5c8d0cc5c91d
 ---
 
 ## Ingredients
