@@ -1,0 +1,69 @@
+{
+  "slug": "leek-and-potato-soup-for-arthur",
+  "title": "Leek and Potato Soup for Arthur",
+  "categories": ["Arthur", "Soups"],
+  "serves": "4–5 baby portions",
+  "prep_time": "5 min",
+  "cook_time": "25 min (Smooth program)",
+  "equipment": ["Soup maker"],
+  "difficulty": "Easy",
+  "tags": ["weaning", "baby-safe", "smooth", "no-added-salt"],
+  "ingredients": [
+    { "quantity": "1", "unit": "tsp", "item": "unsalted butter" },
+    { "quantity": "50", "unit": "g", "item": "onion", "note": "finely chopped" },
+    { "quantity": "200", "unit": "g", "item": "leek", "note": "white and light-green parts only, sliced" },
+    { "quantity": "200", "unit": "g", "item": "potato", "note": "peeled and diced" },
+    { "quantity": "1", "unit": "clove", "item": "garlic", "note": "chopped" },
+    { "quantity": "500", "unit": "ml", "item": "low-salt vegetable stock", "note": "≤ 0.1 g salt per 100 ml" },
+    { "quantity": "50", "unit": "ml", "item": "double cream" }
+  ],
+  "method": [
+    "Add butter, onion and garlic to the soup maker jug.",
+    "Use the sauté/quick cook function on low–medium heat for 3–4 minutes, stirring gently so nothing catches.",
+    "Add leek, potato and stock to the jug.",
+    "Select the Smooth Soup program; the machine will heat, cook and blend automatically (about 25 minutes).",
+    "When finished, open the lid, pour in the double cream, then blend briefly (5–10 seconds) to combine.",
+    "Check texture and add a splash of warm stock if you want it thinner.",
+    "Cool slightly before serving -- ensure it’s warm, not hot."
+  ],
+  "notes": [
+    "Use baby-safe, very low-salt stock only.",
+    "Smooth soup cycle gives a velvety purée, ideal for 7–12 months.",
+    "Store up to 2 days in the fridge or 1 month in the freezer. Reheat until piping hot, then cool before serving.",
+    "Adults can season separately after portioning Arthur’s batch."
+  ],
+  "nutrition": {
+    "energy_kcal": 128,
+    "protein_g": 3.1,
+    "carbs_g": 12.2,
+    "fat_g": 6.8,
+    "salt_g": 0.08
+  },
+  "audience": "Arthur (7–12 months)",
+  "meta": {
+    "servings": { "children": 4, "child_age_months": 10 },
+    "child_age_band": "6–12m",
+    "child_rda_percent": {
+      "energy_kcal": 18,
+      "protein_g": 26,
+      "carbs_g": 13,
+      "fat_g": 22,
+      "salt_g": 8
+    },
+    "child_rda_percent_by_band": {
+      "6–12m": { "energy_kcal": 18, "protein_g": 26, "carbs_g": 13, "fat_g": 22, "salt_g": 8 },
+      "1–3y": { "energy_kcal": 11, "protein_g": 22, "carbs_g": 9, "fat_g": 16, "salt_g": 4 },
+      "4–6y": { "energy_kcal": 8, "protein_g": 16, "carbs_g": 7, "fat_g": 11, "salt_g": 3 },
+      "7–10y": { "energy_kcal": 6, "protein_g": 12, "carbs_g": 6, "fat_g": 9, "salt_g": 2 },
+      "11–14y": { "energy_kcal": 5, "protein_g": 8, "carbs_g": 5, "fat_g": 8, "salt_g": 1 }
+    },
+    "assumptions": [
+      "Equal leek : potato ratio (200 g each).",
+      "1 small onion (50 g) and 1 garlic clove (3 g).",
+      "500 ml baby-safe stock ≤ 0.1 g salt / 100 ml.",
+      "50 ml double cream.",
+      "Prepared using soup maker Smooth Soup program (~25 min).",
+      "Portion ≈ 150 ml (4–5 servings)."
+    ]
+  }
+}
