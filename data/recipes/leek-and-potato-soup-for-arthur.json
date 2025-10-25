@@ -1,6 +1,6 @@
 {
   "slug": "leek-and-potato-soup-for-arthur",
-  "title": "Leek and Potato Soup for Arthur ;-)",
+  "title": "Leek and Potato Soup for Arthur",
   "categories": ["Arthur", "Soups"],
   "serves": "4–5 baby portions",
   "prep_time": "5 min",
@@ -43,6 +43,13 @@
   "meta": {
     "servings": { "children": 4, "child_age_months": 10 },
     "child_age_band": "6–12m",
+    "adult_rda_percent": {
+      "energy_kcal": 6,
+      "protein_g": 6,
+      "carbs_g": 5,
+      "fat_g": 10,
+      "salt_g": 1
+    },
     "child_rda_percent": {
       "energy_kcal": 18,
       "protein_g": 26,
