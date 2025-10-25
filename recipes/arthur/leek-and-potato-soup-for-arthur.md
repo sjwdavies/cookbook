@@ -1,5 +1,5 @@
 ---
-title: "Leek and Potato Soup for Arthur ;-)"
+title: Leek and Potato Soup for Arthur
 slug: "leek-and-potato-soup-for-arthur"
 categories:
   - Arthur
@@ -11,7 +11,7 @@ tags:
   - "no-added-salt"
 audience: Arthur (7–12 months)
 source: "/home/runner/work/cookbook/cookbook/data/recipes/leek-and-potato-soup-for-arthur.json"
-source_digest: 49986c9e75b3ca3948846dc9bafe442d0fde5a31b2411aa00f4e5c8d0cc5c91d
+source_digest: 5030c2148b03f2857c5a35d4373b797abb2c2bfba2b19c60b5af4de9b9684ae0
 ---
 
 ## Ingredients
@@ -45,11 +45,11 @@ source_digest: 49986c9e75b3ca3948846dc9bafe442d0fde5a31b2411aa00f4e5c8d0cc5c91d
 
 | Nutrient | Amount | Adult %RDA | Child %RDA (6–12m) |
 |---|---:|---:|---:|
-| Energy (kcal) | 128 | — | 18 |
-| Protein (g) | 3.1 | — | 26 |
-| Carbs (g) | 12.2 | — | 13 |
-| Fat (g) | 6.8 | — | 22 |
-| Salt (g) | 0.08 | — | 8 |
+| Energy (kcal) | 128 | 6 | 18 |
+| Protein (g) | 3.1 | 6 | 26 |
+| Carbs (g) | 12.2 | 5 | 13 |
+| Fat (g) | 6.8 | 10 | 22 |
+| Salt (g) | 0.08 | 1 | 8 |
 
 ## Child RDA by band (reference)
 
