@@ -1,0 +1,155 @@
+{
+  "slug": "tomato-roasted-red-pepper-soup-soup-maker",
+  "title": "Tomato & Roasted Red Pepper Soup (Soup Maker)",
+  "categories": [
+    "arthur",
+    "soups",
+    "weaning"
+  ],
+  "serves": "4–5 baby portions (or 2 small adult portions)",
+  "prep_time": "5 min",
+  "cook_time": "25 min",
+  "equipment": [
+    "soup maker",
+    "knife",
+    "chopping board"
+  ],
+  "difficulty": "easy",
+  "tags": [
+    "baby",
+    "weaning",
+    "smooth",
+    "vegetarian",
+    "freezer-friendly"
+  ],
+  "ingredients": [
+    {
+      "quantity": "50",
+      "unit": "g",
+      "item": "onion",
+      "note": "chopped"
+    },
+    {
+      "quantity": "1",
+      "unit": "clove",
+      "item": "garlic",
+      "note": "chopped"
+    },
+    {
+      "quantity": "150",
+      "unit": "g",
+      "item": "roasted red peppers",
+      "note": "from jar or freshly roasted"
+    },
+    {
+      "quantity": "400",
+      "unit": "g",
+      "item": "chopped tomatoes",
+      "note": "San Marzano or 5 fresh medium tomatoes"
+    },
+    {
+      "quantity": "200",
+      "unit": "ml",
+      "item": "low-salt vegetable stock"
+    },
+    {
+      "quantity": "100",
+      "unit": "g",
+      "item": "potato",
+      "note": "peeled and diced"
+    },
+    {
+      "quantity": "1",
+      "unit": "tsp",
+      "item": "olive oil or unsalted butter",
+      "note": "optional, for sautéing"
+    }
+  ],
+  "method": [
+    "Sauté onion and garlic in the soup maker for 3–4 minutes (use oil or butter if desired).",
+    "Add roasted red peppers, tomatoes, potato, and vegetable stock.",
+    "Select the smooth soup setting.",
+    "Cook and blend until silky and even in texture."
+  ],
+  "notes": [
+    "Potato adds natural creaminess and body.",
+    "Adjust with extra stock for thinner consistency.",
+    "Serve with baby-safe bread fingers or as a base for adult soup.",
+    "Freezes well in small baby portions."
+  ],
+  "nutrition": {
+    "energy_kcal": 120,
+    "protein_g": 3.2,
+    "carbs_g": 18.4,
+    "fat_g": 3.5,
+    "salt_g": 0.2
+  },
+  "audience": "arthur",
+  "images": [],
+  "meta": {
+    "servings": {
+      "adults": 0,
+      "children": 4,
+      "child_age_months": 9
+    },
+    "adult_rda_percent": {
+      "energy_kcal": 5.5,
+      "protein_g": 6.4,
+      "carbs_g": 7.1,
+      "fat_g": 5.0,
+      "salt_g": 3.3
+    },
+    "child_rda_percent": {
+      "energy_kcal": 6.7,
+      "protein_g": 8.9,
+      "carbs_g": 9.7,
+      "fat_g": 9.0,
+      "salt_g": 20.0
+    },
+    "child_rda_percent_by_band": {
+      "6–12m": {
+        "energy_kcal": 6.7,
+        "protein_g": 8.9,
+        "carbs_g": 9.7,
+        "fat_g": 9.0,
+        "salt_g": 20.0
+      },
+      "1–3y": {
+        "energy_kcal": 4.2,
+        "protein_g": 6.4,
+        "carbs_g": 7.1,
+        "fat_g": 5.0,
+        "salt_g": 10.0
+      },
+      "4–6y": {
+        "energy_kcal": 3.1,
+        "protein_g": 4.8,
+        "carbs_g": 5.5,
+        "fat_g": 4.0,
+        "salt_g": 6.7
+      },
+      "7–10y": {
+        "energy_kcal": 2.8,
+        "protein_g": 3.8,
+        "carbs_g": 4.8,
+        "fat_g": 3.5,
+        "salt_g": 4.0
+      },
+      "11–14y": {
+        "energy_kcal": 2.5,
+        "protein_g": 3.2,
+        "carbs_g": 4.2,
+        "fat_g": 3.0,
+        "salt_g": 3.3
+      }
+    },
+    "child_age_band": "6–12m",
+    "assumptions": [
+      "Ingredient matches: onion → 'onion, raw'; garlic → 'garlic, raw'; roasted red peppers → 'pepper, red, roasted'; chopped tomatoes → 'tomato, canned'; potato → 'potato, white, boiled'; olive oil → 'olive oil'.",
+      "Used tinned tomatoes option for nutrition baseline.",
+      "1 tsp oil = 5 g.",
+      "Total yield 2 adult portions = 4–5 baby portions; calculations per adult portion.",
+      "No added salt (only trace from vegetable stock)."
+    ]
+  }
+}
