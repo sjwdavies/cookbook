@@ -1,0 +1,75 @@
+{
+  "slug": "smooth-onion-gravy-for-arthur",
+  "title": "Smooth Onion Gravy for Arthur",
+  "categories": ["arthur", "weaning", "sauces"],
+  "serves": "2–3 baby portions",
+  "prep_time": "10 min",
+  "cook_time": "45 min",
+  "equipment": ["saucepan", "hand blender", "wooden spoon"],
+  "difficulty": "easy",
+  "tags": ["no-salt", "no-sugar", "weaning", "baby-gravy"],
+  "ingredients": [
+    { "quantity": "100", "unit": "g", "item": "red onion", "note": "about ½ large, peeled and sliced" },
+    { "quantity": "250", "unit": "ml", "item": "unsalted vegetable or homemade beef stock" },
+    { "quantity": "1", "unit": "tbsp", "item": "unsalted butter" },
+    { "quantity": "1", "unit": "tbsp", "item": "plain flour" },
+    { "quantity": "25", "unit": "ml", "item": "water", "note": "to replace wine or adjust consistency" },
+    { "quantity": "0.25", "unit": "tsp", "item": "balsamic vinegar", "note": "no added sugar or salt" }
+  ],
+  "method": [
+    "Melt ½ tbsp butter in a pan over low heat.",
+    "Add sliced onion and cook slowly for 25–30 min until soft and golden.",
+    "Melt remaining butter, then stir in flour to form a smooth paste.",
+    "Gradually whisk in unsalted stock until smooth.",
+    "Add balsamic vinegar and simmer gently for 10–15 min until thickened.",
+    "Blend thoroughly to a smooth texture, adding water if needed.",
+    "Cool before serving."
+  ],
+  "notes": [
+    "Use balsamic vinegar with no added sugar or salt.",
+    "No added salt, sugar, or salted stock cubes.",
+    "Texture: smooth purée for weaning.",
+    "Keeps 2 days refrigerated or 1 month frozen in baby portions."
+  ],
+  "nutrition": {
+    "energy_kcal": 36,
+    "protein_g": 0.6,
+    "carbs_g": 2.8,
+    "fat_g": 2.8,
+    "salt_g": 0.02
+  },
+  "audience": "arthur (7–12 months)",
+  "meta": {
+    "servings": { "adults": null, "children": 3, "child_age_months": 9 },
+    "adult_rda_percent": {
+      "energy_kcal": 1.6,
+      "protein_g": 1.2,
+      "carbs_g": 1.1,
+      "fat_g": 4.0,
+      "salt_g": 0.3
+    },
+    "child_rda_percent": {
+      "energy_kcal": 5.0,
+      "protein_g": 5.0,
+      "carbs_g": 3.0,
+      "fat_g": 9.0,
+      "salt_g": 2.0
+    },
+    "child_rda_percent_by_band": {
+      "6–12m": { "energy_kcal": 5.0, "protein_g": 5.0, "carbs_g": 3.0, "fat_g": 9.0, "salt_g": 2.0 },
+      "1–3y": { "energy_kcal": 3.2, "protein_g": 4.3, "carbs_g": 2.3, "fat_g": 7.4, "salt_g": 1.0 },
+      "4–6y": { "energy_kcal": 2.3, "protein_g": 3.0, "carbs_g": 1.5, "fat_g": 5.5, "salt_g": 0.7 },
+      "7–10y": { "energy_kcal": 1.9, "protein_g": 2.2, "carbs_g": 1.2, "fat_g": 4.6, "salt_g": 0.5 },
+      "11–14y": { "energy_kcal": 1.6, "protein_g": 1.5, "carbs_g": 1.1, "fat_g": 3.9, "salt_g": 0.4 }
+    },
+    "child_age_band": "7–12m",
+    "assumptions": [
+      "Scaled recipe to half batch to maintain flavour balance with 100 g onion.",
+      "Replaced red wine with water for baby safety.",
+      "Used 250 ml unsalted stock to match ratio.",
+      "Removed Worcestershire sauce and redcurrant jelly.",
+      "Added 0.25 tsp balsamic vinegar for gentle acidity.",
+      "Derived nutrition from UK 2025 reference values."
+    ]
+  }
+}
